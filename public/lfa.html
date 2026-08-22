@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LFA Club Gallery</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2b2b3d);
+      color: #fff;
+    }
+    .gallery {
+      display: flex;
+      overflow-x: auto;
+      gap: 1rem;
+      padding: 2rem;
+      scroll-behavior: smooth;
+    }
+    .gallery img {
+      height: 200px;
+      border-radius: 12px;
+      object-fit: cover;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+    }
+    /* Hide scrollbar for WebKit browsers */
+    .gallery::-webkit-scrollbar { display: none; }
+    .gallery { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center; margin-top:1rem;">LFA Club Photo Gallery</h1>
+  <div class="gallery">
+    <!-- Images from public/Assets/LFA -->
+    <img src="/Assets/LFA/1.webp" alt="LFA Image 1" />
+    <img src="/Assets/LFA/2.webp" alt="LFA Image 2" />
+    <img src="/Assets/LFA/3.webp" alt="LFA Image 3" />
+    <img src="/Assets/LFA/4.webp" alt="LFA Image 4" />
+    <img src="/Assets/LFA/5.webp" alt="LFA Image 5" />
+    <img src="/Assets/LFA/6.webp" alt="LFA Image 6" />
+    <img src="/Assets/LFA/7.webp" alt="LFA Image 7" />
+    <img src="/Assets/LFA/8.webp" alt="LFA Image 8" />
+    <img src="/Assets/LFA/9.webp" alt="LFA Image 9" />
+    <img src="/Assets/LFA/10.webp" alt="LFA Image 10" />
+    <!-- Add more images as needed -->
+  </div>
+</body>
+</html>

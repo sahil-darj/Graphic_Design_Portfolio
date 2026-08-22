@@ -1,0 +1,310 @@
+{
+  "unused": [
+    "Assets/ai.jpg",
+    "Assets/ai2.jpg",
+    "Assets/ai3.jpg",
+    "Assets/BEST/b10.jpg",
+    "Assets/BEST/b12.png",
+    "Assets/BEST/b13.png",
+    "Assets/BEST/b14.png",
+    "Assets/BEST/b15.png",
+    "Assets/caricature/c10.png",
+    "Assets/caricature/c11.png",
+    "Assets/caricature/c4.png",
+    "Assets/caricature/c5.png",
+    "Assets/caricature/c6.png",
+    "Assets/celeb/260819207_193982786261355_1588071163268267077_n.jpg",
+    "Assets/celeb/280762007_744896633536475_5838535849298480914_n.webp",
+    "Assets/celeb/anand mahindra digital artwork  .png",
+    "Assets/celeb/c4.jpg",
+    "Assets/celeb/emraan final.png",
+    "Assets/celeb/PicsArt_05-23-07.12.25.jpg",
+    "Assets/celeb/ravi kishan.png",
+    "Assets/celeb/salman.png",
+    "Assets/celeb/salmansouth.png",
+    "Assets/celeb/virat.jpg",
+    "Assets/celeb/vivek ranjan digital art.png",
+    "Assets/comica1617510237131.jpg",
+    "Assets/digital/digital work.png",
+    "Assets/digital/new3.png",
+    "Assets/e007157c-6f4b-42c2-ba8d-10b7f5bd387f.png",
+    "Assets/final1-1.png",
+    "Assets/IMG_20210718_110848_276.jpg",
+    "Assets/Jai Shree Ram.jpg",
+    "Assets/judone.png",
+    "Assets/k1.png",
+    "Assets/LFA/l3.png",
+    "Assets/logo/ads.webp",
+    "Assets/logo/ai.png",
+    "Assets/logo/canva.jpeg",
+    "Assets/logo/cd.jpg",
+    "Assets/logo/digital.jpg",
+    "Assets/logo/do-professional-and-unique-logo-design.png",
+    "Assets/logo/figma.webp",
+    "Assets/logo/pc.png",
+    "Assets/logo/pencil.jpg",
+    "Assets/logo/ps.png",
+    "Assets/logo/th-stencil-logo-5.jpg",
+    "Assets/mp.jpg",
+    "Assets/oil/op2.png",
+    "Assets/order/o3.png",
+    "Assets/order/o5.png",
+    "Assets/order/o8.png",
+    "Assets/PicsArt_11-19-07.14.41.jpg",
+    "Assets/s11.jpg",
+    "Assets/Sahil_cv.docx",
+    "Assets/ssr.jpg",
+    "Assets/stencil/Antim postar.png",
+    "Assets/stencil/FINAL WORK OF TKF.png",
+    "Assets/stencil/goro.png",
+    "Assets/stencil/new1.png",
+    "Assets/stencil/PicsArt_07-10-09.43.36.jpg",
+    "Assets/stencil/stencil 2 (1).png",
+    "Assets/stencil/stencil 2 (2).png",
+    "Assets/stencil/yeswecan_20210721_161044.png",
+    "Assets/stencil/yeswecan_20210922_154932.png",
+    "Assets/stencil/yeswecan_20211219_102700.png",
+    "Assets/stencil/yeswecan_20220108_164305.png",
+    "Assets/stencil/yeswecan_20220108_164434.png",
+    "Assets/stencil/yeswecan_20220109_191628.png",
+    "Assets/stencil/yeswecan_20220421_121800.png",
+    "Assets/stencil/yeswecan_20220425_084324.png",
+    "Assets/tejasvi Surya digital artwork , .png",
+    "Assets/uiux/Light Brown Simple Cute Illustrative Online Shop Dashboard Mobile App UI Prototype (1).png",
+    "Assets/uiux/Renteeasy-CF0IYvhZ.png",
+    "Assets/uiux/SCS Canva.pdf",
+    "Assets/uiux/SCS Photoshop (1).pdf",
+    "Assets/uiux/SCS Photoshop (2).pdf",
+    "Celeb/deepak bhurani.jpg",
+    "Celeb/moin Kureshi.jpg",
+    "Celeb/paresh rawal.jpg",
+    "hero-background/background.jpg",
+    "hero-background/index.html",
+    "hero-background/style.css",
+    "hero-background/thumbnails/background.jpg",
+    "hero-background/thumbnails/NEWIMG/gandr-collage (2).jpg",
+    "hero-background/thumbnails/NEWIMG/gandr-collage.jpg"
+  ],
+  "duplicates": [
+    {
+      "original": "Assets/BEST/b7.png",
+      "duplicate": "Assets/c1.png"
+    },
+    {
+      "original": "Assets/BEST/b11.png",
+      "duplicate": "Assets/caricature/c4.png"
+    },
+    {
+      "original": "Assets/BEST/b14.png",
+      "duplicate": "Assets/caricature/x8.png"
+    },
+    {
+      "original": "Assets/BEST/b8.png",
+      "duplicate": "Assets/celeb/c3.png"
+    },
+    {
+      "original": "Assets/BEST/b10.jpg",
+      "duplicate": "Assets/celeb/c4.jpg"
+    },
+    {
+      "original": "Assets/BEST/b6.png",
+      "duplicate": "Assets/final2.png"
+    },
+    {
+      "original": "Assets/BEST/b2.png",
+      "duplicate": "Assets/LFA/l13.png"
+    },
+    {
+      "original": "Assets/BEST/b1.png",
+      "duplicate": "Assets/LFA/l7.png"
+    },
+    {
+      "original": "Assets/logo/ai.png",
+      "duplicate": "Assets/logo/illustartor.png"
+    },
+    {
+      "original": "Assets/logo/photohsop.png",
+      "duplicate": "Assets/logo/ps.png"
+    },
+    {
+      "original": "Assets/BEST/b9.png",
+      "duplicate": "Assets/order/o10.png"
+    },
+    {
+      "original": "Assets/BEST/b5.png",
+      "duplicate": "Assets/order/o3.png"
+    },
+    {
+      "original": "Assets/clients/s1.png",
+      "duplicate": "Assets/s1.png"
+    },
+    {
+      "original": "Assets/clients/s2.png",
+      "duplicate": "Assets/s2.png"
+    },
+    {
+      "original": "Assets/BEST/b4.png",
+      "duplicate": "Assets/stencil/s1.png"
+    },
+    {
+      "original": "Assets/BEST/b12.png",
+      "duplicate": "Assets/stencil/s4.png"
+    },
+    {
+      "original": "Assets/BEST/b13.png",
+      "duplicate": "Assets/stencil/s7.png"
+    },
+    {
+      "original": "Assets/BEST/b15.png",
+      "duplicate": "Assets/stencil/s9.png"
+    },
+    {
+      "original": "Assets/BEST/b16.png",
+      "duplicate": "Assets/Team/t4.png"
+    },
+    {
+      "original": "Assets/4.jpeg",
+      "duplicate": "hero-background/background/4.jpeg"
+    },
+    {
+      "original": "Assets/4.jpg",
+      "duplicate": "hero-background/background/4.jpg"
+    },
+    {
+      "original": "Assets/6.jpeg",
+      "duplicate": "hero-background/background/6.jpeg"
+    },
+    {
+      "original": "Assets/6.jpg",
+      "duplicate": "hero-background/background/6.jpg"
+    },
+    {
+      "original": "Assets/7.jpg",
+      "duplicate": "hero-background/background/7.jpg"
+    },
+    {
+      "original": "Assets/aly.png",
+      "duplicate": "hero-background/background/aly.png"
+    },
+    {
+      "original": "Assets/3.webp",
+      "duplicate": "hero-background/background/CENTER/3.webp"
+    },
+    {
+      "original": "Assets/5.jpeg",
+      "duplicate": "hero-background/background/CENTER/5.jpeg"
+    },
+    {
+      "original": "Assets/5.jpg",
+      "duplicate": "hero-background/background/CENTER/5.jpg"
+    },
+    {
+      "original": "Assets/8.jpeg",
+      "duplicate": "hero-background/background/CENTER/8.jpeg"
+    },
+    {
+      "original": "Assets/8.jpg",
+      "duplicate": "hero-background/background/CENTER/8.jpg"
+    },
+    {
+      "original": "Assets/joker1.png",
+      "duplicate": "hero-background/background/CENTER/joker1.png"
+    },
+    {
+      "original": "Assets/uiux/lndneatss Photoshop 2.png",
+      "duplicate": "hero-background/background/CENTER/lndneatss Photoshop 2.png"
+    },
+    {
+      "original": "Assets/order/or4.png",
+      "duplicate": "hero-background/background/CENTER/or4.png"
+    },
+    {
+      "original": "Assets/em.jpg",
+      "duplicate": "hero-background/background/em.jpg"
+    },
+    {
+      "original": "Assets/BEST/b6.png",
+      "duplicate": "hero-background/background/final2.png"
+    },
+    {
+      "original": "Assets/hr.png",
+      "duplicate": "hero-background/background/hr.png"
+    },
+    {
+      "original": "Assets/LFA/l10.png",
+      "duplicate": "hero-background/background/l10.png"
+    },
+    {
+      "original": "Assets/BEST/b2.png",
+      "duplicate": "hero-background/background/l13.png"
+    },
+    {
+      "original": "Assets/LFA/l14.png",
+      "duplicate": "hero-background/background/l14.png"
+    },
+    {
+      "original": "Assets/LFA/l4.png",
+      "duplicate": "hero-background/background/l4.png"
+    },
+    {
+      "original": "Assets/BEST/b1.png",
+      "duplicate": "hero-background/background/l7.png"
+    },
+    {
+      "original": "Assets/uiux/movie4.png",
+      "duplicate": "hero-background/background/movie4.png"
+    },
+    {
+      "original": "Assets/order/o6.png",
+      "duplicate": "hero-background/background/o6.png"
+    },
+    {
+      "original": "Assets/order/o7.png",
+      "duplicate": "hero-background/background/o7.png"
+    },
+    {
+      "original": "Assets/order/or1.png",
+      "duplicate": "hero-background/background/or1.png"
+    },
+    {
+      "original": "Assets/order/or2.png",
+      "duplicate": "hero-background/background/or2.png"
+    },
+    {
+      "original": "Assets/BEST/b4.png",
+      "duplicate": "hero-background/background/s1.png"
+    },
+    {
+      "original": "Assets/clients/s2.png",
+      "duplicate": "hero-background/background/s2.png"
+    },
+    {
+      "original": "Assets/stencil/s8.png",
+      "duplicate": "hero-background/background/s8.png"
+    },
+    {
+      "original": "Assets/BEST/b16.png",
+      "duplicate": "hero-background/background/t4.png"
+    },
+    {
+      "original": "Assets/celeb/c1.png",
+      "duplicate": "hero-background/c1.png"
+    },
+    {
+      "original": "Assets/BEST/b8.png",
+      "duplicate": "hero-background/c3.png"
+    },
+    {
+      "original": "Assets/LFA/l6.png",
+      "duplicate": "hero-background/l6.png"
+    },
+    {
+      "original": "Assets/Team/t1.png",
+      "duplicate": "hero-background/t1.png"
+    },
+    {
+      "original": "Assets/BEST/b16.png",
+      "duplicate": "hero-background/thumbnails/background/t4.png"
+    }
+  ]
+}

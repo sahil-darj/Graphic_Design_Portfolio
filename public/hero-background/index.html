@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Cinematic Wall</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <section class="banner-section">
+        <div class="grid-container" id="grid">
+            <!-- Images will be injected here -->
+        </div>
+
+        <div class="overlay"></div>
+        <div class="overlay-bottom"></div>
+    </section>
+
+    <script>
+        // Images that MUST be in the center
+        const specialPriority = [
+            "background/CENTER/sonunigam.png",
+            "background/CENTER/lndneatss Photoshop 2.png",
+            "background/CENTER/5.jpg",
+            "background/CENTER/KISAAN.png"
+        ];
+
+        const otherCenterImages = [
+            "3.webp", "5.jpeg", "55ec105e-c227-4f14-a557-faf4d38bc70b.png",
+            "8.jpeg", "8.jpg", "Agriculture POST Design - PSD.png", "BUDDH-PURNIMA-POST2.png",
+            "POSTER1 (2).png", "SOCIALMEDIA.png", "a4b378e6-2a4d-40cd-bcd5-fba8fd4932ac.png",
+            "dosafinal.png", "joker1.png", "or4.png",
+            "poster2 (1).png", "poster2.png"
+        ].map(n => `background/CENTER/${n}`);
+
+        const outerImageList = [
+            "13284653-b232-45fe-9e19-f165ede9cd7e.png", "3ff47a92-0e66-440c-9216-6e4f970e366e.png",
+            "4.jpeg", "4.jpg", "6.jpeg", "6.jpg", "61436862-a5ae-4c0d-9a64-96d3811744d5.png",
+            "7.jpg", "Certificate of appreciation with futuristic design.png",
+            "ChatGPT Image Mar 27, 2026, 08_36_36 PM.png", "ae8a188b-b997-4790-9115-ce070083f2c9.png",
+            "aly.png", "em.jpg", "final1111.png", "final2.png",
+            "freepik__professional-vector-logo-for-enagar-representing-s__50600.png",
+            "hero-premium (3).png", "hr.png", "l10.png", "l13.png", "l14.png", "l4.png", "l7.png",
+            "movie4.png", "o6.png", "o7.png", "or1.png", "or2.png", "poster1.png",
+            "s1.png", "s2.png", "s8.png", "srkkkk.png", "t4.png", "task2-3.png", "Design 1 Photoshop.png"
+        ].map(n => `background/${n}`);
+
+        // Handle images in root differently if needed, but since we map to background/ we should adjust
+        const rootImages = ["Design 1 Photoshop.png"];
+        const outerImagesFinal = [
+            ...outerImageList.filter(path => !path.includes("Design 1 Photoshop.png")),
+            ...rootImages
+        ];
+
+        // Combine and shuffle remaining images
+        const cornerTopLeft = ["c1.png", "c3.png", "l6.png"];
+        const cornerBottomRight = ["t1.png"];
+        const remaining = [...otherCenterImages, ...outerImagesFinal];
+        remaining.sort(() => Math.random() - 0.5);
+
+        const half = Math.floor(remaining.length / 2);
+        const tiledList = [
+            ...cornerTopLeft,
+            ...remaining.slice(0, half),
+            ...specialPriority,
+            ...remaining.slice(half),
+            ...cornerBottomRight
+        ];
+
+        const grid = document.getElementById('grid');
+
+        tiledList.forEach(path => {
+            const item = document.createElement('div');
+            item.className = 'grid-item';
+
+            const img = document.createElement('img');
+            // Optimizing: Use thumbnail if available
+            img.src = `thumbnails/${path}`;
+            img.loading = "lazy";
+            img.onclick = () => window.open(path, '_blank'); // Allow viewing full res on click
+            img.style.cursor = "pointer";
+            img.decoding = "async";
+
+            img.onerror = () => {
+                // If thumbnail fails, try original
+                if (img.src.includes('thumbnails/')) {
+                    img.src = path;
+                } else {
+                    item.style.display = 'none';
+                }
+            };
+
+            item.appendChild(img);
+            grid.appendChild(item);
+        });
+
+        // Parallax for 1.1 scale
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 15;
+            const y = (e.clientY / window.innerHeight - 0.5) * 15;
+            grid.style.transform = `translate(-50%, -50%) perspective(1500px) rotateX(${25 + y / 2}deg) rotateZ(${-12 + x / 2}deg) scale(0.5)`;
+        });
+    </script>
+</body>
+
+</html>
