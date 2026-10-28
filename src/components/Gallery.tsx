@@ -30,6 +30,8 @@ const brochures: Brochure[] = [
   { id: 8,  title: "VIT Brochure",      subtitle: "Institute Brochure",          file: "/Assets/Brochure/VIT Brochure (1).pdf",                                   color: "from-red-600 to-rose-800",       accentFrom: "#dc2626", accentTo: "#9f1239", cover: "/Assets/Brochure/cover_VIT Brochure (1).pdf.jpg" },
   { id: 6,  title: "Vibrant India 2026",subtitle: "Exhibition Brochure",         file: "/Assets/Brochure/Vibrant_India_2026_Exhibition_Brochure (2).pdf",         color: "from-[#a033ff] to-[#ff3388]",   accentFrom: "#a033ff", accentTo: "#ff3388", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Exhibition_Brochure (2).pdf.jpg" },
   { id: 7,  title: "Vibrant India 2026",subtitle: "Stainless Steel Conference",  file: "/Assets/Brochure/Vibrant_India_2026_Stainless_Steel_Conference (1).pdf",  color: "from-slate-500 to-zinc-700",     accentFrom: "#64748b", accentTo: "#3f3f46", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Stainless_Steel_Conference (1).pdf.jpg" },
+  { id: 10, title: "Brand Expo 2026",   subtitle: "Exhibition Brochure",         file: "/Assets/Vibrant new/Brochure/BRAND EXPO BROCHURE (1).pdf",                color: "from-blue-600 to-indigo-800",    accentFrom: "#2563eb", accentTo: "#3730a3", cover: "/Assets/Vibrant new/Brochure/cover_BRAND EXPO BROCHURE (1).pdf.jpg" },
+  { id: 11, title: "Stainless Steel Expo", subtitle: "Official Brochure",        file: "/Assets/Vibrant new/Brochure/Stainless Steel Brochuree.pdf",              color: "from-cyan-600 to-blue-700",      accentFrom: "#0891b2", accentTo: "#1d4ed8", cover: "/Assets/Vibrant new/Brochure/cover_Stainless Steel Brochuree.pdf.jpg" },
   { id: 9,  title: "Website Development",subtitle: "Services Brochure",         file: "/Assets/Brochure/Website Development (1).pdf",                            color: "from-indigo-600 to-blue-800",    accentFrom: "#4f46e5", accentTo: "#1e40af", cover: "/Assets/Brochure/cover_Website Development (1).pdf.jpg" },
   { id: 1,  title: "Catalog Design",    subtitle: "& Product Photography",       file: "/Assets/Brochure/CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf",           color: "from-violet-600 to-purple-800",  accentFrom: "#7c3aed", accentTo: "#6b21a8", cover: "/Assets/Brochure/cover_CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf.jpg" },
   { id: 2,  title: "Mobile App",        subtitle: "Development",                 file: "/Assets/Brochure/Mobile App Development (1).pdf",                         color: "from-blue-600 to-cyan-700",      accentFrom: "#2563eb", accentTo: "#0e7490", cover: "/Assets/Brochure/cover_Mobile App Development (1).pdf.jpg" },
@@ -129,6 +131,30 @@ function Gallery() {
 
   /* ─────── artwork data ──────────────────────────────────────────── */
   const artworks: Artwork[] = [
+  // ── Vibrant India Posts (1, 2, 3, 4, 5 first!) ──
+  { "id": 601, "title": "Brand Expo Post 1",         "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/1.jpg" },
+  { "id": 602, "title": "Brand Expo Post 2",         "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/2.jpg" },
+  { "id": 603, "title": "Brand Expo Post 3",         "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/3.jpg" },
+  { "id": 604, "title": "Brand Expo Post 4",         "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/4.jpg" },
+  { "id": 605, "title": "Brand Expo Post 5",         "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/5.webp" },
+  { "id": 606, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 1.jpg" },
+  { "id": 607, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 2.jpg" },
+  { "id": 608, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 3.jpg" },
+  { "id": 609, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 4.jpg" },
+  { "id": 610, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 9.jpg" },
+  { "id": 611, "title": "Brand Expo Post",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo post 11.jpg" },
+  { "id": 612, "title": "Brand Expo 9-10",           "category": "vibrant", "medium": "Brand Expo Exhibition",    "description": "Vibrant India Brand Expo official post.", "image": "/Assets/Vibrant new/Brand Expo 9-10.webp" },
+  { "id": 613, "title": "Brand Expo Visitor Banner", "category": "vibrant", "medium": "Exhibition Banner",       "description": "Vibrant India Brand Expo visitor guide banner.", "image": "/Assets/Vibrant new/brand expo visitor.webp" },
+  { "id": 614, "title": "Navratri Festive Post",     "category": "vibrant", "medium": "Festival Greeting",        "description": "Vibrant India festive greeting post.", "image": "/Assets/Vibrant new/navratri2.webp" },
+  { "id": 615, "title": "Social Media 14-10",        "category": "vibrant", "medium": "Social Media Post",        "description": "Vibrant India official social post.", "image": "/Assets/Vibrant new/Social media 14-10.jpg" },
+  { "id": 616, "title": "Stainless Steel Post 2",    "category": "vibrant", "medium": "Conference & Expo Post",   "description": "Vibrant India Stainless Steel post.", "image": "/Assets/Vibrant new/Stainless steel 2.jpg" },
+  { "id": 617, "title": "Stainless Steel Post 8-10", "category": "vibrant", "medium": "Conference & Expo Post",   "description": "Vibrant India Stainless Steel post.", "image": "/Assets/Vibrant new/Stainless Steel Post 8-10.jpg" },
+  { "id": 501, "title": "KP Industries",             "category": "vibrant", "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/KP Industries.png" },
+  { "id": 502, "title": "Meta Foils",                "category": "vibrant", "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/META FOILS.png" },
+  { "id": 503, "title": "Roop Alloys",               "category": "vibrant", "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/Roop Alloys.png" },
+  { "id": 504, "title": "Shree Shyam",               "category": "vibrant", "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/SHREE SHYAM.png" },
+  { "id": 505, "title": "Varahi Steel",              "category": "vibrant", "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/VARAHI STEEL.png" },
+  // ── Existing Social Media Posts ──
   { "id": 261, "title": "Social Media Post",        "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/d1.png" },
   { "id": 262, "title": "Social Media Post",        "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/d2.png" },
   { "id": 1,   "title": "1 Social Media Post",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/1 Social Media Post.webp" },
@@ -306,15 +332,14 @@ function Gallery() {
   { "id": 168, "title": "LFA Issue 22 Certificate 1","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte  1.webp" },
   { "id": 169, "title": "LFA Issue 22 Certificate 2","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 2.webp" },
   { "id": 170, "title": "LFA Issue 22 Certificate 3","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 3.webp" },
-  { "id": 501, "title": "KP Industries",             "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/KP Industries.png" },
-  { "id": 502, "title": "Meta Foils",                "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/META FOILS.png" },
-  { "id": 503, "title": "Roop Alloys",               "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/Roop Alloys.png" },
-  { "id": 504, "title": "Shree Shyam",               "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/SHREE SHYAM.png" },
-  { "id": 505, "title": "Varahi Steel",              "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/VARAHI STEEL.png" },
 ];
 
   /* ─────── derived data ───────────────────────────────────────────── */
-  const vibrantBrochures = brochures.filter(b => b.title.toLowerCase().includes("vibrant"));
+  const vibrantBrochures = brochures.filter(b => 
+    b.title.toLowerCase().includes("vibrant") || 
+    b.title.toLowerCase().includes("brand expo") || 
+    b.title.toLowerCase().includes("stainless steel")
+  );
 
   const filteredArtworks: Artwork[] =
     activeCategory === "all"      ? artworks

@@ -5,15 +5,23 @@ const CinematicBackground: React.FC = () => {
     const [tiledList, setTiledList] = useState<string[]>([]);
 
     useEffect(() => {
-        // Images that MUST be in the center
+        // Images that MUST be in the center (including Vibrant India posts)
         const specialPriority = [
+            "/Assets/Vibrant new/1.jpg",
+            "/Assets/Vibrant new/2.jpg",
+            "/Assets/Vibrant new/3.jpg",
             "background/CENTER/sonunigam.webp",
             "background/CENTER/lndneatss Photoshop 2.webp",
+            "/Assets/Vibrant new/4.jpg",
+            "/Assets/Vibrant new/5.webp",
             "background/CENTER/5.webp",
             "background/CENTER/KISAAN.webp",
+            "/Assets/Vibrant new/Brand Expo post 1.jpg",
         ];
 
         const otherCenterImages = [
+            "/Assets/Vibrant new/Stainless steel 2.jpg",
+            "/Assets/Vibrant new/Brand Expo post 3.jpg",
             "3.webp",
             "55ec105e-c227-4f14-a557-faf4d38bc70b.webp",
             "8.webp",
@@ -27,7 +35,7 @@ const CinematicBackground: React.FC = () => {
             "or4.webp",
             "poster2 (1).webp",
             "poster2.webp",
-        ].map((n) => `background/CENTER/${n}`);
+        ].map((n) => n.startsWith("/") ? n : `background/CENTER/${n}`);
 
         const outerImageList = [
             "13284653-b232-45fe-9e19-f165ede9cd7e.webp",
@@ -116,13 +124,15 @@ const CinematicBackground: React.FC = () => {
                         className="relative h-[280px] flex-grow bg-[#0a0a0a] rounded-lg overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.9)] border border-white/10"
                     >
                         <img
-                            src={`/hero-background/thumbnails/${path}`}
+                            src={path.startsWith("/") ? path : `/hero-background/thumbnails/${path}`}
                             alt={`Art ${index}`}
                             className="h-full w-full block object-cover brightness-90"
                             loading="lazy"
                             onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                if (target.src.includes("thumbnails/")) {
+                                if (path.startsWith("/")) {
+                                    target.parentElement!.style.display = "none";
+                                } else if (target.src.includes("thumbnails/")) {
                                     target.src = `/hero-background/${path}`;
                                 } else {
                                     target.parentElement!.style.display = "none";
