@@ -43,6 +43,7 @@ const brochures: Brochure[] = [
 const CATEGORY_MAP: Record<string, string> = {
   socialmedia: "Social Media",
   group:       "LFA Club Projects",
+  vibrant:     "Vibrant India",
   certificate: "Certificates",
   Logo:        "Branding & Logos",
   brochure:    "Brochures",
@@ -55,9 +56,6 @@ const CATEGORY_MAP: Record<string, string> = {
   digital:     "Order Works",
 };
 
-// Visible filter IDs
-const MAIN_FILTERS = ["all", "socialmedia", "print"] as const;
-
 const DROPDOWN_CATEGORIES = [
   { id: "Logo",        label: "Branding & Logos" },
   { id: "digital",     label: "Order Works / Commissions" },
@@ -69,7 +67,6 @@ const DROPDOWN_CATEGORIES = [
   { id: "stencil",     label: "Stencil" },
   { id: "brochure",    label: "Brochures" },
   { id: "certificate", label: "Certificates" },
-  { id: "group",       label: "LFA Club Projects" },
 ];
 
 /* cells that need a light background because the artwork is transparent */
@@ -123,6 +120,8 @@ function Gallery() {
   const activeLabel =
     activeCategory === "all" ? "All Work"
     : activeCategory === "socialmedia" ? "Social Media"
+    : activeCategory === "group" ? "LFA Club Projects"
+    : activeCategory === "vibrant" ? "Vibrant India"
     : activeCategory === "print" ? "Print & Editorial"
     : DROPDOWN_CATEGORIES.find(d => d.id === activeCategory)?.label ?? "All Work";
 
@@ -307,9 +306,16 @@ function Gallery() {
   { "id": 168, "title": "LFA Issue 22 Certificate 1","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte  1.webp" },
   { "id": 169, "title": "LFA Issue 22 Certificate 2","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 2.webp" },
   { "id": 170, "title": "LFA Issue 22 Certificate 3","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 3.webp" },
+  { "id": 501, "title": "KP Industries",             "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/KP Industries.png" },
+  { "id": 502, "title": "Meta Foils",                "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/META FOILS.png" },
+  { "id": 503, "title": "Roop Alloys",               "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/Roop Alloys.png" },
+  { "id": 504, "title": "Shree Shyam",               "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/SHREE SHYAM.png" },
+  { "id": 505, "title": "Varahi Steel",              "category": "vibrant",      "medium": "Magazine & Exhibition",    "description": "Vibrant India B2B Exhibition & Magazine design.", "image": "/Assets/Vibrant India/VARAHI STEEL.png" },
 ];
 
   /* ─────── derived data ───────────────────────────────────────────── */
+  const vibrantBrochures = brochures.filter(b => b.title.toLowerCase().includes("vibrant"));
+
   const filteredArtworks: Artwork[] =
     activeCategory === "all"      ? artworks
     : activeCategory === "print"  ? artworks.filter(a => a.category === "stencil")
@@ -317,7 +323,10 @@ function Gallery() {
     : artworks.filter(a => a.category === activeCategory);
 
   const showBrochures =
-    activeCategory === "print" || activeCategory === "brochure";
+    activeCategory === "print" || activeCategory === "brochure" || activeCategory === "vibrant";
+
+  const displayBrochures =
+    activeCategory === "vibrant" ? vibrantBrochures : brochures;
 
   const visibleArtworks = filteredArtworks.slice(0, visibleCount);
   const hasMore = filteredArtworks.length > visibleCount;
@@ -332,26 +341,79 @@ function Gallery() {
       style={{ background: "linear-gradient(135deg,#faf8ff 0%,#f5f0ff 40%,#fdf4ff 70%,#f8f9ff 100%)" }}
     >
 
-      {/* ── Blurred color bubbles ── */}
+      {/* ── Colorful Blurred Bubbles (Rich, Vibrant & Floating) ── */}
       <div aria-hidden="true" className="pointer-events-none select-none absolute inset-0 overflow-hidden">
-        {/* Purple top-left */}
-        <div className="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full opacity-30"
-          style={{ background: "radial-gradient(circle,#a855f7,transparent 70%)", filter: "blur(80px)" }} />
-        {/* Pink top-right */}
-        <div className="absolute -top-16 right-0 w-[400px] h-[400px] rounded-full opacity-25"
-          style={{ background: "radial-gradient(circle,#f472b6,transparent 70%)", filter: "blur(90px)" }} />
-        {/* Sky-blue mid-left */}
-        <div className="absolute top-1/2 -left-24 w-[350px] h-[350px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#38bdf8,transparent 70%)", filter: "blur(80px)" }} />
-        {/* Pale yellow center-right */}
-        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#fbbf24,transparent 70%)", filter: "blur(100px)" }} />
-        {/* Purple bottom-right */}
-        <div className="absolute -bottom-24 right-0 w-[450px] h-[450px] rounded-full opacity-25"
-          style={{ background: "radial-gradient(circle,#818cf8,transparent 70%)", filter: "blur(90px)" }} />
-        {/* Pink bottom-left */}
-        <div className="absolute -bottom-12 left-1/3 w-[280px] h-[280px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle,#fb7185,transparent 70%)", filter: "blur(70px)" }} />
+        {/* Vibrant Magenta & Violet Bubble — Top Center Behind Heading */}
+        <div
+          className="absolute -top-12 left-1/2 -translate-x-1/2 w-[560px] h-[560px] rounded-full opacity-70 animate-float-1"
+          style={{
+            background: "radial-gradient(circle at 40% 40%, #ff2d92 0%, #a855f7 45%, #6366f1 70%, transparent 85%)",
+            filter: "blur(55px)",
+          }}
+        />
+
+        {/* Electric Cyan & Sky-Blue Bubble — Top Right */}
+        <div
+          className="absolute top-10 right-[-4%] w-[500px] h-[500px] rounded-full opacity-70 animate-float-2"
+          style={{
+            background: "radial-gradient(circle at 40% 40%, #06b6d4 0%, #3b82f6 55%, transparent 80%)",
+            filter: "blur(50px)",
+          }}
+        />
+
+        {/* Hot Pink & Coral Bubble — Top Left Behind Category Buttons */}
+        <div
+          className="absolute top-36 left-[-5%] w-[480px] h-[480px] rounded-full opacity-70 animate-float-3"
+          style={{
+            background: "radial-gradient(circle at 50% 50%, #f43f5e 0%, #ec4899 50%, transparent 80%)",
+            filter: "blur(50px)",
+          }}
+        />
+
+        {/* Warm Golden Amber & Tangerine Bubble — Mid Grid Center */}
+        <div
+          className="absolute top-[35%] left-[48%] -translate-x-1/2 w-[440px] h-[440px] rounded-full opacity-65 animate-float-1"
+          style={{
+            background: "radial-gradient(circle at 45% 45%, #fbbf24 0%, #f97316 55%, transparent 75%)",
+            filter: "blur(55px)",
+          }}
+        />
+
+        {/* Neon Emerald & Teal Bubble — Mid Right Side */}
+        <div
+          className="absolute top-[48%] -right-10 w-[460px] h-[460px] rounded-full opacity-65 animate-float-2"
+          style={{
+            background: "radial-gradient(circle at 40% 40%, #10b981 0%, #06b6d4 55%, transparent 75%)",
+            filter: "blur(50px)",
+          }}
+        />
+
+        {/* Deep Electric Purple & Indigo Bubble — Mid Left Side */}
+        <div
+          className="absolute top-[60%] -left-12 w-[520px] h-[520px] rounded-full opacity-70 animate-float-3"
+          style={{
+            background: "radial-gradient(circle at 40% 40%, #8b5cf6 0%, #4f46e5 60%, transparent 80%)",
+            filter: "blur(55px)",
+          }}
+        />
+
+        {/* Vibrant Rose & Fuchsia Bubble — Lower Center Right */}
+        <div
+          className="absolute top-[75%] right-[12%] w-[500px] h-[500px] rounded-full opacity-70 animate-float-1"
+          style={{
+            background: "radial-gradient(circle at 45% 45%, #ec4899 0%, #f43f5e 55%, transparent 80%)",
+            filter: "blur(55px)",
+          }}
+        />
+
+        {/* Bright Turquoise & Azure Bubble — Bottom Left */}
+        <div
+          className="absolute -bottom-16 left-[5%] w-[480px] h-[480px] rounded-full opacity-70 animate-float-2"
+          style={{
+            background: "radial-gradient(circle at 40% 40%, #38bdf8 0%, #6366f1 60%, transparent 80%)",
+            filter: "blur(50px)",
+          }}
+        />
       </div>
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -369,31 +431,45 @@ function Gallery() {
           </p>
         </div>
 
-        {/* ── Category nav ── */}
+        {/* ── Category nav (5 outside + dropdown) ── */}
         <div className="flex flex-wrap justify-center items-center gap-2 mb-10">
 
-          {/* All Work */}
+          {/* 1. All Work */}
           <FilterPill
             label="All Work"
             active={activeCategory === "all"}
             onClick={() => selectCategory("all")}
           />
 
-          {/* Social Media */}
+          {/* 2. Social Media */}
           <FilterPill
             label="Social Media"
             active={activeCategory === "socialmedia"}
             onClick={() => selectCategory("socialmedia")}
           />
 
-          {/* Print & Editorial */}
+          {/* 3. LFA Club Projects */}
+          <FilterPill
+            label="LFA Club Projects"
+            active={activeCategory === "group"}
+            onClick={() => selectCategory("group")}
+          />
+
+          {/* 4. Vibrant India */}
+          <FilterPill
+            label="Vibrant India"
+            active={activeCategory === "vibrant"}
+            onClick={() => selectCategory("vibrant")}
+          />
+
+          {/* 5. Print & Editorial */}
           <FilterPill
             label="Print & Editorial"
             active={activeCategory === "print"}
             onClick={() => selectCategory("print")}
           />
 
-          {/* More Categories dropdown */}
+          {/* 6. More Categories dropdown */}
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(o => !o)}
@@ -448,23 +524,29 @@ function Gallery() {
 
         {/* ── Gallery content ── */}
 
-        {/* BROCHURES (shown for "print" and "brochure" filters) */}
+        {/* BROCHURES (shown for "print", "brochure", and "vibrant" filters) */}
         {showBrochures && (
           <div className="mb-12">
             {activeCategory === "print" && (
               <SectionLabel>Brochures & Publications</SectionLabel>
             )}
+            {activeCategory === "vibrant" && (
+              <SectionLabel>Vibrant India 2026 Brochures</SectionLabel>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {brochures.map(b => (
+              {displayBrochures.map(b => (
                 <BrochureCard key={b.id} brochure={b} onOpen={setActivePdf} />
               ))}
             </div>
           </div>
         )}
 
-        {/* STENCIL sub-header when print tab is active */}
+        {/* Sub-headers for artwork section */}
         {activeCategory === "print" && filteredArtworks.length > 0 && (
           <SectionLabel>Stencil Art</SectionLabel>
+        )}
+        {activeCategory === "vibrant" && filteredArtworks.length > 0 && (
+          <SectionLabel>Magazine & Exhibition Designs</SectionLabel>
         )}
 
         {/* ARTWORK MASONRY */}
@@ -640,11 +722,11 @@ function BrochureCard({ brochure, onOpen }: { brochure: Brochure; onOpen: (b: Br
   return (
     <div
       onClick={() => onOpen(brochure)}
-      className="group cursor-pointer rounded-2xl overflow-hidden bg-white border border-gray-100
-                 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      className="group cursor-pointer rounded-2xl overflow-hidden bg-white/85 backdrop-blur-md border border-white/90
+                 shadow-sm hover:shadow-2xl hover:shadow-purple-500/15 hover:-translate-y-1.5 transition-all duration-300"
     >
       {/* Cover image — full, unobscured */}
-      <div className="relative overflow-hidden bg-gray-50" style={{ aspectRatio: "4/3" }}>
+      <div className="relative overflow-hidden bg-gray-50/80" style={{ aspectRatio: "4/3" }}>
         <img
           src={brochure.cover}
           alt={brochure.title}
@@ -667,12 +749,12 @@ function BrochureCard({ brochure, onOpen }: { brochure: Brochure; onOpen: (b: Br
         </div>
       </div>
 
-      {/* Info panel — clean white surface */}
-      <div className="p-4">
+      {/* Info panel — clean translucent surface */}
+      <div className="p-4 bg-white/60">
         <h4 className="text-gray-900 font-bold text-base leading-tight truncate">{brochure.title}</h4>
-        <p className="text-gray-400 text-sm mt-0.5 truncate">{brochure.subtitle}</p>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">Brochure</span>
+        <p className="text-gray-500 text-sm mt-0.5 truncate">{brochure.subtitle}</p>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100/80">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Brochure</span>
           <span
             className="flex items-center gap-1 text-xs font-semibold transition-colors duration-200"
             style={{ color: brochure.accentFrom }}
@@ -703,11 +785,11 @@ function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }
   return (
     <div
       className="break-inside-avoid mb-5 group relative cursor-pointer rounded-2xl overflow-hidden
-                 bg-white border border-gray-100 shadow-sm
-                 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                 bg-white/85 backdrop-blur-md border border-white/90 shadow-sm
+                 hover:shadow-2xl hover:shadow-purple-500/15 hover:-translate-y-1.5 transition-all duration-300"
       onClick={onClick}
     >
-      <div className={`relative overflow-hidden ${needsLightBg ? "bg-slate-100" : "bg-gray-50"}`}>
+      <div className={`relative overflow-hidden ${needsLightBg ? "bg-slate-100" : "bg-gray-50/50"}`}>
         <img
           src={artwork.image}
           alt={artwork.title}

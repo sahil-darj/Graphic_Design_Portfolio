@@ -20,4 +20,35 @@
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(25px, -20px) scale(1.06); }
+  }
+  @keyframes float-reverse {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(-25px, 20px) scale(0.96); }
+  }
+  @keyframes float-alt {
+    0%, 100% { transform: translate(0px, 0px) scale(1); }
+    50% { transform: translate(20px, 25px) scale(1.05); }
+  }
+
+  .animate-float-1 {
+    animation: float-slow 10s ease-in-out infinite;
+  }
+  .animate-float-2 {
+    animation: float-reverse 13s ease-in-out infinite;
+  }
+  .animate-float-3 {
+    animation: float-alt 11s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float-1,
+    .animate-float-2,
+    .animate-float-3 {
+      animation: none !important;
+    }
+  }
 }
