@@ -30,19 +30,24 @@ function Hero({ scrollToGallery }: HeroProps) {
             </span>
           </motion.div>
 
-          {/* Name — compact, balanced, two lines */}
+          {/* Name — Bold, Unique & Artistic Display Typography */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-6 select-none"
+            className="mb-6 select-none relative"
           >
-            <h1 className="text-[clamp(3rem,9vw,6.5rem)] font-black leading-[0.88] tracking-tighter">
-              <span className="text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+            {/* Ambient colorful backlight behind the name */}
+            <div
+              className="absolute -top-10 -left-10 w-80 sm:w-96 h-64 bg-gradient-to-r from-cyan-500/25 via-purple-600/35 to-pink-500/30 blur-[75px] rounded-full pointer-events-none -z-10"
+              aria-hidden="true"
+            />
+
+            <h1 className="font-syne text-[clamp(3.5rem,10.5vw,7.4rem)] font-[900] leading-[0.88] tracking-[-0.035em] uppercase">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-b from-white via-neutral-100 to-slate-200 drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] [text-shadow:0_0_40px_rgba(255,255,255,0.25)]">
                 SAHIL
               </span>
-              {" "}
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_4px_24px_rgba(168,85,247,0.45)]">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00f2fe] via-[#a855f7] to-[#ff2a85] drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)] filter [filter:drop-shadow(0_0_35px_rgba(168,85,247,0.6))]">
                 DARJI
               </span>
             </h1>
