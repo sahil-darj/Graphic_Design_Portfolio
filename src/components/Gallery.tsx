@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { 
-  X, Image, PenTool, Palette, 
-  Users, User, VenetianMask, Droplet, Hexagon, Scissors, 
-  Layout, Heart, Award, BookOpen, FolderOpen, FileText, Download, ExternalLink
+  X, Layers, Megaphone, Hexagon, BookOpen, Palette, Layout,
+  Heart, FileText, Download, ExternalLink, ChevronDown
 } from "lucide-react";
 
 interface Artwork {
@@ -36,24 +35,41 @@ const brochures: Brochure[] = [
 ];
 
 function Gallery() {
-  const [activeCategory, setActiveCategory] = useState("socialmedia");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [lightboxImage, setLightboxImage] = useState<Artwork | null>(null);
   const [activePdf, setActivePdf] = useState<Brochure | null>(null);
+  const [visibleCount, setVisibleCount] = useState(24);
 
+  // ── Six broad filters ──────────────────────────────────────────────────────
   const categories = [
-    { id: "socialmedia",   label: "Social Media Post",       icon: <Image size={16} /> },
-    { id: "group",        label: "LFA Club Projects",        icon: <Users size={16} /> },
-    { id: "brochure",     label: "Brochure",                 icon: <BookOpen size={16} /> },
-    { id: "digital",      label: "Order Works",              icon: <PenTool size={16} /> },
-    { id: "handmade",     label: "Handmade Art",             icon: <Palette size={16} /> },
-    { id: "celebrity",    label: "Celebrity Portraits",      icon: <User size={16} /> },
-    { id: "caricature",   label: "Caricatures",              icon: <VenetianMask size={16} /> },
-    { id: "oilpainting",  label: "Digital Oil Painting",     icon: <Droplet size={16} /> },
-    { id: "Logo",         label: "Logo",                     icon: <Hexagon size={16} /> },
-    { id: "stencil",      label: "Stencil",                  icon: <Scissors size={16} /> },
-    { id: "UIUX",         label: "UI/UX Design",             icon: <Layout size={16} /> },
-    { id: "certificate",  label: "Certificate",              icon: <Award size={16} /> },
+    { id: "all",          label: "All Work",               icon: <Layers size={15} /> },
+    { id: "social",       label: "Social & Advertising",   icon: <Megaphone size={15} /> },
+    { id: "branding",     label: "Branding & Logos",       icon: <Hexagon size={15} /> },
+    { id: "print",        label: "Print & Editorial",      icon: <BookOpen size={15} /> },
+    { id: "illustration", label: "Illustration & Portraits",icon: <Palette size={15} /> },
+    { id: "digital",      label: "Digital & UI/UX",        icon: <Layout size={15} /> },
   ];
+
+  // ── Maps old categories to new broad ones ──────────────────────────────────
+  const categoryMap: Record<string, string> = {
+    // Social & Advertising
+    socialmedia: "social",
+    group:       "social",   // LFA Club Projects (campaign / event posts)
+    certificate: "social",   // Certificate designs (print deliverables for events)
+    // Branding & Logos
+    Logo:        "branding",
+    // Print & Editorial
+    brochure:    "print",
+    stencil:     "print",
+    // Illustration & Portraits
+    handmade:    "illustration",
+    celebrity:   "illustration",
+    caricature:  "illustration",
+    oilpainting: "illustration",
+    // Digital & UI/UX
+    UIUX:        "digital",
+    digital:     "digital",  // Order Works (digital commissions)
+  };
 
   const artworks: Artwork[] = [
   {
@@ -1477,16 +1493,13 @@ function Gallery() {
   }
 ];
 
-  // Filter artworks based on category
+  // ── Filter artworks using the broad category map ─────────────────────────
   const filteredArtworks =
     activeCategory === "all"
       ? artworks
-      : artworks.filter((art) => art.category === activeCategory);
-  const transparentCelebs = [
-    "/Assets/celeb/4 ravi kishan.webp",
-    "/Assets/celeb/6 anand mahindra digital artwork.webp",
-    "/Assets/celeb/8 vivek ranjan digital art.webp"
-  ];
+      : activeCategory === "print"
+        ? artworks.filter((a) => categoryMap[a.category] === "print" && a.category !== "brochure")
+        : artworks.filter((a) => categoryMap[a.category] === activeCategory);
 
   return (
     <section id="gallery" className="py-20 bg-[#060714]">
@@ -1515,19 +1528,19 @@ function Gallery() {
           </p>
         </div>
 
-        {/* Category buttons */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10">
+        {/* Category filters — 6 broad pills */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
           {categories.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => { setActiveCategory(cat.id); }}
-              className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-medium transition-all duration-300 border ${
+              onClick={() => { setActiveCategory(cat.id); setVisibleCount(24); }}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${
                 activeCategory === cat.id
-                  ? "bg-gradient-to-r from-[#a033ff] to-[#ff3388] border-transparent text-white shadow-[0_0_15px_rgba(160,51,255,0.4)]"
-                  : "bg-[#0c0d1a] border-white/5 text-neutral-400 hover:text-white hover:border-white/10 hover:bg-white/5"
+                  ? "bg-gradient-to-r from-[#a033ff] to-[#ff3388] border-transparent text-white shadow-[0_0_18px_rgba(160,51,255,0.45)]"
+                  : "bg-[#0c0d1a] border-white/8 text-neutral-400 hover:text-white hover:border-white/15 hover:bg-white/5"
               }`}
             >
-              <span className={`${activeCategory === cat.id ? "text-white" : "text-[#a033ff]"}`}>
+              <span className={activeCategory === cat.id ? "text-white" : "text-[#a033ff]"}>
                 {cat.icon}
               </span>
               {cat.label}
@@ -1537,264 +1550,139 @@ function Gallery() {
 
 
 
-        {/* Gallery Rendering */}
-        {activeCategory === 'brochure' ? (
-          /* PDF Brochure Grid */
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-            {brochures.map((brochure) => (
-              <div
-                key={brochure.id}
-                onClick={() => setActivePdf(brochure)}
-                className="group relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(160,51,255,0.12)] hover:border-white/10"
-              >
-                {/* Image top panel */}
-                <div className="relative h-56 w-full overflow-hidden bg-neutral-900 border-b border-white/[0.06]">
-                  <img src={brochure.cover} alt={brochure.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d1a] via-[#0c0d1a]/20 to-transparent" />
-                  <div className={`absolute top-3 right-3 bg-gradient-to-r ${brochure.color} text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_4px_12px_rgba(0,0,0,0.5)]`}>PDF</div>
-                </div>
+        {/* ── Gallery Rendering ──────────────────────────────────────────── */}
 
-                {/* Info panel */}
-                <div className="p-5">
-                  <h4 className="text-white font-bold text-base leading-tight">{brochure.title}</h4>
-                  <p className="text-neutral-400 text-sm mt-0.5">{brochure.subtitle}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-[11px] text-neutral-600 uppercase tracking-widest font-semibold">Brochure</span>
-                    <div className="flex items-center gap-1.5 text-[#a033ff] text-xs font-semibold group-hover:text-[#ff3388] transition-colors duration-300">
-                      <ExternalLink size={12} />
-                      View PDF
-                    </div>
-                  </div>
-                </div>
-
-                {/* Hover glow line */}
-                <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${brochure.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-              </div>
-            ))}
-          </div>
-        ) : activeCategory === 'UIUX' ? (
-          /* Exact Collage Layout for UIUX */
-          (() => {
-            const getImg = (kw: string) => filteredArtworks.find(a => a.image.toLowerCase().includes(kw.toLowerCase()));
-            
-            const cinemood = getImg("cinemood");
-            const naroda = getImg("164543");
-            const rentEasy = getImg("renteeasy");
-            const rewear = getImg("rewear");
-            const tech = getImg("164515");
-            const industrial = getImg("164438");
-
-            const mobile1 = getImg("deign  3") || getImg("deign 3"); // CampusMart
-            const mobile2 = getImg("ui1"); // Bharat Dark
-            const mobile3 = getImg("deign  1") || getImg("deign 1"); // Food Categories
-            const mobile4 = getImg("ui2"); // Bharat White
-            const mobile5 = getImg("deign 2"); // TasteNow
-            const mediscope = getImg("mediscope");
-
-            const usedIds = [cinemood, naroda, rentEasy, rewear, tech, industrial, mobile1, mobile2, mobile3, mobile4, mobile5, mediscope]
-              .filter(Boolean)
-              .map(a => a!.id);
-              
-            const otherArtworks = filteredArtworks.filter(a => !usedIds.includes(a.id));
-
-            const renderCard = (artwork: any) => {
-              if (!artwork) return null;
-              return (
-                <div
-                  key={artwork.id}
-                  className="group relative rounded-[20px] overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(160,51,255,0.15)] bg-transparent w-full h-full"
-                  onClick={() => setLightboxImage(artwork)}
-                >
-                  <div className="w-full h-full relative overflow-hidden">
-                    <img
-                      src={artwork.image}
-                      alt={artwork.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02] filter brightness-[1.05]"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                  </div>
-                  <button 
-                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:bg-[#ff3388]/60 hover:border-[#ff3388] z-10"
-                    onClick={(e) => { e.stopPropagation(); }}
+        {/* Print & Editorial: show brochures first, then stencil images */}
+        {activeCategory === 'print' ? (
+          <div className="flex flex-col gap-10">
+            {/* Brochures sub-section */}
+            <div>
+              <h3 className="text-neutral-400 text-xs uppercase tracking-widest font-semibold mb-5">Brochures</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                {brochures.map((brochure) => (
+                  <div
+                    key={brochure.id}
+                    onClick={() => setActivePdf(brochure)}
+                    className="group relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(160,51,255,0.12)] hover:border-white/10"
                   >
-                    <Heart size={16} className="text-white" />
-                  </button>
-                </div>
-              );
-            };
+                    <div className="relative h-56 w-full overflow-hidden bg-neutral-900 border-b border-white/[0.06]">
+                      <img src={brochure.cover} alt={brochure.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d1a] via-[#0c0d1a]/20 to-transparent" />
+                      <div className={`absolute top-3 right-3 bg-gradient-to-r ${brochure.color} text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_4px_12px_rgba(0,0,0,0.5)]`}>PDF</div>
+                    </div>
+                    <div className="p-5">
+                      <h4 className="text-white font-bold text-base leading-tight">{brochure.title}</h4>
+                      <p className="text-neutral-400 text-sm mt-0.5">{brochure.subtitle}</p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-[11px] text-neutral-600 uppercase tracking-widest font-semibold">Brochure</span>
+                        <div className="flex items-center gap-1.5 text-[#a033ff] text-xs font-semibold group-hover:text-[#ff3388] transition-colors duration-300">
+                          <ExternalLink size={12} /> View PDF
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${brochure.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* Stencil prints sub-section */}
+            {filteredArtworks.length > 0 && (
+              <div>
+                <h3 className="text-neutral-400 text-xs uppercase tracking-widest font-semibold mb-5">Stencil Art</h3>
+                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
+                  {filteredArtworks.slice(0, visibleCount).map((artwork) => (
+                    <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
+                  ))}
+                </div>
+                {filteredArtworks.length > visibleCount && (
+                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={filteredArtworks.length - visibleCount} />
+                )}
+              </div>
+            )}
+          </div>
+        ) : activeCategory === 'digital' ? (
+          // Digital & UI/UX — unified masonry
+          (() => {
+            const uiuxItems = artworks.filter(a => a.category === "UIUX");
+            const orderItems = artworks.filter(a => a.category === "digital");
+            const allDigital = [...uiuxItems, ...orderItems];
+            const visible = allDigital.slice(0, visibleCount);
             return (
-              <div className="flex flex-col gap-5 w-full">
-                {/* Main Split: Left (Cinemood) vs Right (Everything Else) */}
-                <div className="flex flex-col lg:flex-row gap-5 w-full">
-                  
-                  {/* Left Column: Cinemood (Spans full height naturally) */}
-                  <div className="w-full lg:w-[28%] flex flex-col gap-5">
-                    {renderCard(cinemood)}
-                    {mediscope && (
-                      <div className="w-[260px]">
-                        {renderCard(mediscope)}
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Right Section: Contains the grid and mobile screens */}
-                  <div className="w-full lg:w-[72%] flex flex-col gap-5">
-                    
-                    {/* Top part of Right Section: 2 Columns with 3:2 ratio */}
-                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 w-full">
-                      
-                      {/* Left Side (Spans 3 cols): Naroda, RentEasy, Tech Opportunities */}
-                      <div className="lg:col-span-3 flex flex-col gap-5">
-                        {renderCard(naroda)}
-                        {renderCard(rentEasy)}
-                        {renderCard(tech)}
-                      </div>
-                      
-                      {/* Right Side (Spans 2 cols): ReWear, Industrial */}
-                      <div className="lg:col-span-2 flex flex-col gap-5">
-                        {renderCard(rewear)}
-                        {renderCard(industrial)}
-                      </div>
-                    </div>
-
-                    {/* Bottom part of Right Section: 5 Mobile Screens in exactly ONE row with the same size! */}
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 w-full mt-auto">
-                      {renderCard(mobile1)}
-                      {renderCard(mobile2)}
-                      {renderCard(mobile3)}
-                      {renderCard(mobile4)}
-                      {renderCard(mobile5)}
-                    </div>
-                    
-                  </div>
+              <div>
+                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
+                  {visible.map(artwork => (
+                    <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
+                  ))}
                 </div>
-
-                {/* Any remaining unmatched artworks */}
-                {otherArtworks.length > 0 && (
-                  <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full mt-5">
-                    {otherArtworks.map(renderCard)}
-                  </div>
+                {allDigital.length > visibleCount && (
+                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={allDigital.length - visibleCount} />
                 )}
               </div>
             );
           })()
-        ) : activeCategory === 'group' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
-            {filteredArtworks.map((artwork) => {
-              const isWide = artwork.image.endsWith('11.webp');
-              return (
-                <div
-                  key={artwork.id}
-                  className={`group relative rounded-[20px] overflow-hidden border border-white/[0.03] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(160,51,255,0.15)] ${
-                    isWide ? 'col-span-1 sm:col-span-2' : 'col-span-1'
-                  }`}
-                  onClick={() => setLightboxImage(artwork)}
-                >
-                  <div className="w-full relative overflow-hidden flex items-center justify-center">
-                    <img
-                      src={artwork.image}
-                      alt={artwork.title}
-                      className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02] filter brightness-[1.05]"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                      <h4 className="text-white text-base font-bold tracking-wide">{artwork.title}</h4>
-                      <p className="text-purple-400 text-xs font-medium mt-0.5">{artwork.medium}</p>
-                    </div>
-                    <button 
-                      className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:bg-[#ff3388]/40 hover:border-[#ff3388] z-10"
-                      onClick={(e) => { e.stopPropagation(); }}
-                    >
-                      <Heart size={16} className="text-white" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         ) : (
-          /* Standard Masonry Layout for all other categories */
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
-            {filteredArtworks
-              .filter(a => a.title !== "L10")
-              .map((artwork) => (
-                <div
-                  key={artwork.id}
-                  className="break-inside-avoid mb-5 group relative rounded-[20px] overflow-hidden border border-white/[0.03] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_15px_30px_rgba(0,0,0,0.5),0_0_30px_rgba(160,51,255,0.15)]"
-                  onClick={() => setLightboxImage(artwork)}
-                >
-                  {/* Artwork Image in Original Size */}
-                  <div className="w-full relative overflow-hidden">
-                    <img
-                      src={artwork.image}
-                      alt={artwork.title}
-                      className={`w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02] filter brightness-[1.05] ${transparentCelebs.includes(artwork.image) ? "bg-[#e2e8f0]" : ""}`}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
-                  </div>
-
-                  {/* Heart Button */}
-                  <button 
-                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:bg-[#ff3388]/40 hover:border-[#ff3388] z-10"
-                    onClick={(e) => { e.stopPropagation(); /* Prevent opening lightbox */ }}
-                  >
-                    <Heart size={16} className="text-white" />
-                  </button>
+          /* Standard masonry for all other filters */
+          (() => {
+            const visible = filteredArtworks.slice(0, visibleCount);
+            return (
+              <div>
+                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
+                  {visible
+                    .filter(a => a.title !== "L10")
+                    .map((artwork) => (
+                      <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
+                    ))}
                 </div>
-              ))}
-          </div>
+                {filteredArtworks.length > visibleCount && (
+                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={filteredArtworks.length - visibleCount} />
+                )}
+              </div>
+            );
+          })()
         )}
 
-
-
-        {/* Lightbox */}
+        {/* ── Lightbox Modal ─────────────────────────────────────────────── */}
         {lightboxImage && (
           <div
             className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
             onClick={() => setLightboxImage(null)}
           >
             <button
-              className="absolute top-4 right-4 text-white hover:text-neutral-300 transition-colors"
+              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
               onClick={() => setLightboxImage(null)}
             >
-              <X size={32} />
+              <X size={20} />
             </button>
 
-            <div className="max-w-4xl w-full bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-700">
-              <div className="aspect-video flex items-center justify-center bg-black/20">
+            <div
+              className="max-w-4xl w-full bg-[#0e0f1c] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="max-h-[72vh] flex items-center justify-center bg-black/30">
                 <img
                   src={lightboxImage.image}
                   alt={lightboxImage.title}
-                  className="w-full h-full object-contain"
+                  className="w-full max-h-[72vh] object-contain"
                   loading="lazy"
                   decoding="async"
                 />
               </div>
-
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2 text-white">
-                  {lightboxImage.title}
-                </h3>
-                <p className="text-amber-400 mb-4">{lightboxImage.medium}</p>
-                <p className="text-neutral-300">{lightboxImage.description}</p>
+              <div className="p-6 border-t border-white/[0.06]">
+                <h3 className="text-xl font-bold text-white mb-1">{lightboxImage.title}</h3>
+                <p className="text-purple-400 text-sm font-semibold mb-1">{lightboxImage.medium}</p>
+                <p className="text-neutral-400 text-sm">{lightboxImage.description}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* ===== PDF Viewer Modal ===== */}
+        {/* ── PDF Viewer Modal ───────────────────────────────────────────── */}
         {activePdf && (
           <div
             className="fixed inset-0 z-[60] flex flex-col bg-black/95 backdrop-blur-md"
             onClick={(e) => { if (e.target === e.currentTarget) setActivePdf(null); }}
           >
-            {/* Header bar */}
             <div className="flex items-center justify-between px-5 py-3 bg-neutral-900/90 border-b border-white/[0.06] backdrop-blur-md flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${activePdf.color} flex items-center justify-center shadow-lg`}>
@@ -1812,8 +1700,7 @@ function Gallery() {
                   onClick={(e) => e.stopPropagation()}
                   className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#a033ff] to-[#ff3388] text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(160,51,255,0.3)]"
                 >
-                  <Download size={13} />
-                  Download
+                  <Download size={13} /> Download
                 </a>
                 <button
                   onClick={() => setActivePdf(null)}
@@ -1823,8 +1710,6 @@ function Gallery() {
                 </button>
               </div>
             </div>
-
-            {/* PDF iframe */}
             <div className="flex-1 relative overflow-hidden">
               <iframe
                 src={`${activePdf.file}#toolbar=1&navpanes=1&scrollbar=1&view=FitH`}
@@ -1837,6 +1722,62 @@ function Gallery() {
 
       </div>
     </section>
+  );
+}
+
+// ── Reusable art card ────────────────────────────────────────────────────────
+const transparentCelebs = [
+  "/Assets/celeb/4 ravi kishan.webp",
+  "/Assets/celeb/6 anand mahindra digital artwork.webp",
+  "/Assets/celeb/8 vivek ranjan digital art.webp"
+];
+
+function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }) {
+  return (
+    <div
+      className="break-inside-avoid mb-5 group relative rounded-[20px] overflow-hidden border border-white/[0.03] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.55),0_0_28px_rgba(160,51,255,0.14)] hover:border-white/8"
+      onClick={onClick}
+    >
+      <div className="w-full relative overflow-hidden">
+        <img
+          src={artwork.image}
+          alt={artwork.title}
+          className={`w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.03] filter brightness-[1.04] ${
+            transparentCelebs.includes(artwork.image) ? "bg-[#e2e8f0]" : ""
+          }`}
+          loading="lazy"
+          decoding="async"
+        />
+        {/* Hover overlay with title */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+          <p className="text-white text-sm font-bold leading-tight">{artwork.title}</p>
+          <p className="text-purple-400 text-xs font-medium mt-0.5">{artwork.medium}</p>
+        </div>
+        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300 pointer-events-none" />
+      </div>
+      <button
+        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:bg-[#ff3388]/40 hover:border-[#ff3388] z-10"
+        onClick={(e) => e.stopPropagation()}
+        aria-label="Like"
+      >
+        <Heart size={14} className="text-white" />
+      </button>
+    </div>
+  );
+}
+
+// ── Load More button ─────────────────────────────────────────────────────────
+function LoadMoreBtn({ onClick, remaining }: { onClick: () => void; remaining: number }) {
+  return (
+    <div className="flex justify-center mt-10">
+      <button
+        onClick={onClick}
+        className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#a033ff] to-[#ff3388] rounded-full font-bold text-white text-sm hover:opacity-90 hover:shadow-[0_0_24px_rgba(160,51,255,0.45)] transition-all duration-300 active:scale-95"
+      >
+        <ChevronDown size={18} />
+        Load More <span className="opacity-70 font-normal">({remaining} remaining)</span>
+      </button>
+    </div>
   );
 }
 
