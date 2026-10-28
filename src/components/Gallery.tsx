@@ -556,17 +556,10 @@ function Gallery() {
             {filteredArtworks.length > 0 && (
               <div className="mb-14">
                 <SectionLabel>Magazine & Exhibition Designs</SectionLabel>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-start">
-                  {visibleArtworks
-                    .filter(a => a.title !== "L10")
-                    .map(artwork => (
-                      <ArtCard
-                        key={artwork.id}
-                        artwork={artwork}
-                        onClick={() => setLightboxImage(artwork)}
-                      />
-                    ))}
-                </div>
+                <MasonryGrid
+                  artworks={visibleArtworks.filter(a => a.title !== "L10")}
+                  onCardClick={setLightboxImage}
+                />
               </div>
             )}
 
@@ -582,6 +575,117 @@ function Gallery() {
               </div>
             )}
           </div>
+        ) : activeCategory === "UIUX" ? (
+          /* Exact Curated Collage Layout for UIUX */
+          (() => {
+            const getImg = (kw: string) =>
+              filteredArtworks.find(a => a.image.toLowerCase().includes(kw.toLowerCase()));
+
+            const cinemood = getImg("cinemood");
+            const naroda = getImg("164543");
+            const rentEasy = getImg("renteeasy");
+            const rewear = getImg("rewear");
+            const tech = getImg("164515");
+            const industrial = getImg("164438");
+
+            const mobile1 = getImg("deign  3") || getImg("deign 3"); // CampusMart
+            const mobile2 = getImg("ui1"); // Bharat Dark
+            const mobile3 = getImg("deign  1") || getImg("deign 1"); // Food Categories
+            const mobile4 = getImg("ui2"); // Bharat White
+            const mobile5 = getImg("deign 2"); // TasteNow
+            const mediscope = getImg("mediscope");
+
+            const usedIds = [
+              cinemood, naroda, rentEasy, rewear, tech, industrial,
+              mobile1, mobile2, mobile3, mobile4, mobile5, mediscope
+            ]
+              .filter(Boolean)
+              .map(a => a!.id);
+
+            const otherArtworks = filteredArtworks.filter(a => !usedIds.includes(a.id));
+
+            const renderUiCard = (artwork: Artwork | undefined) => {
+              if (!artwork) return null;
+              return (
+                <div
+                  key={artwork.id}
+                  className="group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-purple-500/15 bg-white/85 backdrop-blur-md border border-white/90 shadow-sm w-full h-full"
+                  onClick={() => setLightboxImage(artwork)}
+                >
+                  <div className="w-full h-full relative overflow-hidden bg-gray-50/50">
+                    <img
+                      src={artwork.image}
+                      alt={artwork.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                      <p className="text-white text-sm font-bold leading-tight drop-shadow">{artwork.title}</p>
+                      <p className="text-purple-200 text-xs font-medium mt-0.5 drop-shadow">{artwork.medium || "UI/UX Design"}</p>
+                    </div>
+                    {/* Zoom icon */}
+                    <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow">
+                      <ZoomIn size={14} className="text-gray-700" />
+                    </div>
+                  </div>
+                </div>
+              );
+            };
+
+            return (
+              <div className="flex flex-col gap-5 w-full">
+                {/* Main Split: Left (Cinemood & Mediscope) vs Right (Desktop mockups & Mobile row) */}
+                <div className="flex flex-col lg:flex-row gap-5 w-full">
+                  {/* Left Column: Cinemood (Spans full height naturally) + Mediscope */}
+                  <div className="w-full lg:w-[28%] flex flex-col gap-5">
+                    {renderUiCard(cinemood)}
+                    {mediscope && (
+                      <div className="w-full">
+                        {renderUiCard(mediscope)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Section: Contains the grid and mobile screens */}
+                  <div className="w-full lg:w-[72%] flex flex-col gap-5">
+                    {/* Top part of Right Section: 2 Columns with 3:2 ratio */}
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-5 w-full">
+                      {/* Left Side (Spans 3 cols): Naroda, RentEasy, Tech Opportunities */}
+                      <div className="lg:col-span-3 flex flex-col gap-5">
+                        {renderUiCard(naroda)}
+                        {renderUiCard(rentEasy)}
+                        {renderUiCard(tech)}
+                      </div>
+
+                      {/* Right Side (Spans 2 cols): ReWear, Industrial */}
+                      <div className="lg:col-span-2 flex flex-col gap-5">
+                        {renderUiCard(rewear)}
+                        {renderUiCard(industrial)}
+                      </div>
+                    </div>
+
+                    {/* Bottom part of Right Section: 5 Mobile Screens in exactly ONE row with the same size */}
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-5 w-full mt-auto">
+                      {renderUiCard(mobile1)}
+                      {renderUiCard(mobile2)}
+                      {renderUiCard(mobile3)}
+                      {renderUiCard(mobile4)}
+                      {renderUiCard(mobile5)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Any remaining unmatched artworks */}
+                {otherArtworks.length > 0 && (
+                  <div className="mt-5">
+                    <MasonryGrid artworks={otherArtworks} onCardClick={setLightboxImage} />
+                  </div>
+                )}
+              </div>
+            );
+          })()
         ) : (
           /* ALL OTHER CATEGORIES */
           <div>
@@ -604,19 +708,12 @@ function Gallery() {
               <SectionLabel>Stencil Art</SectionLabel>
             )}
 
-            {/* ARTWORK HORIZONTAL GRID (Left-to-Right Horizontal Sequence) */}
+            {/* ARTWORK MASONRY (No awkward empty spaces, seamless horizontal round-robin packing) */}
             {visibleArtworks.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-start">
-                {visibleArtworks
-                  .filter(a => a.title !== "L10")
-                  .map(artwork => (
-                    <ArtCard
-                      key={artwork.id}
-                      artwork={artwork}
-                      onClick={() => setLightboxImage(artwork)}
-                    />
-                  ))}
-              </div>
+              <MasonryGrid
+                artworks={visibleArtworks.filter(a => a.title !== "L10")}
+                onCardClick={setLightboxImage}
+              />
             )}
           </div>
         )}
@@ -870,6 +967,69 @@ function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }
           <ZoomIn size={14} className="text-gray-700" />
         </div>
       </div>
+    </div>
+  );
+}
+
+function MasonryGrid({
+  artworks,
+  onCardClick,
+}: {
+  artworks: Artwork[];
+  onCardClick: (artwork: Artwork) => void;
+}) {
+  const [cols, setCols] = useState(() => {
+    if (typeof window !== "undefined") {
+      const w = window.innerWidth;
+      if (w < 640) return 1;
+      if (w < 768) return 2;
+      if (w < 1280) return 3;
+      return 4;
+    }
+    return 4;
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      if (w < 640) setCols(1);
+      else if (w < 768) setCols(2);
+      else if (w < 1280) setCols(3);
+      else setCols(4);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const columns: Artwork[][] = Array.from({ length: cols }, () => []);
+  artworks.forEach((art, idx) => {
+    columns[idx % cols].push(art);
+  });
+
+  return (
+    <div
+      className={`grid gap-5 items-start ${
+        cols === 1
+          ? "grid-cols-1"
+          : cols === 2
+          ? "grid-cols-2"
+          : cols === 3
+          ? "grid-cols-3"
+          : "grid-cols-4"
+      }`}
+    >
+      {columns.map((colArtworks, colIndex) => (
+        <div key={colIndex} className="flex flex-col gap-5">
+          {colArtworks.map(artwork => (
+            <ArtCard
+              key={artwork.id}
+              artwork={artwork}
+              onClick={() => onCardClick(artwork)}
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }
