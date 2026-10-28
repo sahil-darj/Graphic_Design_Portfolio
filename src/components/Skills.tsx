@@ -213,12 +213,12 @@ export default function Skills() {
                   <span className="text-white/70 text-xs">Photoshop</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/[0.03] hover:bg-white/[0.08] transition-colors p-2 rounded-xl border border-white/[0.05]">
-                  <img src="/Assets/logo/canva.webp" alt="Canva" className="w-6 h-6 object-contain rounded-md" />
-                  <span className="text-white/70 text-xs">Canva</span>
+                  <img src="/Assets/logo/coreldraw.webp" alt="CorelDRAW" className="w-6 h-6 object-contain rounded-md" />
+                  <span className="text-white/70 text-xs">CorelDRAW</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/[0.03] hover:bg-white/[0.08] transition-colors p-2 rounded-xl border border-white/[0.05]">
-                  <img src="/Assets/logo/figma.webp" alt="Figma" className="w-6 h-6 object-contain rounded-md" />
-                  <span className="text-white/70 text-xs">Figma</span>
+                  <img src="/Assets/logo/canva.webp" alt="Canva" className="w-6 h-6 object-contain rounded-md" />
+                  <span className="text-white/70 text-xs">Canva</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/[0.03] hover:bg-white/[0.08] transition-colors p-2 rounded-xl border border-white/[0.05]">
                   <img src="/Assets/logo/autodesk.webp" alt="Sketchbook" className="w-6 h-6 object-contain rounded-md" />
@@ -237,8 +237,8 @@ export default function Skills() {
                   <span className="text-white/70 text-xs flex gap-1">Illustrator <span className="opacity-50">(Basic)</span></span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/[0.03] hover:bg-white/[0.08] transition-colors p-2 rounded-xl border border-white/[0.05]">
-                  <img src="/Assets/logo/coreldraw.webp" alt="CorelDRAW" className="w-6 h-6 object-contain rounded-md" />
-                  <span className="text-white/70 text-xs flex gap-1">CorelDRAW <span className="opacity-50">(Basic)</span></span>
+                  <img src="/Assets/logo/figma.webp" alt="Figma" className="w-6 h-6 object-contain rounded-md" />
+                  <span className="text-white/70 text-xs flex gap-1">Figma <span className="opacity-50">(Basic)</span></span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/[0.03] hover:bg-white/[0.08] transition-colors p-2 rounded-xl border border-white/[0.05]">
                   <img src="/Assets/logo/ob.webp" alt="Obsidian" className="w-6 h-6 object-contain rounded-md" />
