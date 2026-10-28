@@ -549,43 +549,75 @@ function Gallery() {
 
         {/* ── Gallery content ── */}
 
-        {/* BROCHURES (shown for "print", "brochure", and "vibrant" filters) */}
-        {showBrochures && (
-          <div className="mb-12">
-            {activeCategory === "print" && (
-              <SectionLabel>Brochures & Publications</SectionLabel>
+        {/* SPECIAL VIBRANT INDIA VIEW: Designs FIRST, then Brochures! */}
+        {activeCategory === "vibrant" ? (
+          <div>
+            {/* 1. Magazine & Exhibition Designs (FIRST) */}
+            {filteredArtworks.length > 0 && (
+              <div className="mb-14">
+                <SectionLabel>Magazine & Exhibition Designs</SectionLabel>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-start">
+                  {visibleArtworks
+                    .filter(a => a.title !== "L10")
+                    .map(artwork => (
+                      <ArtCard
+                        key={artwork.id}
+                        artwork={artwork}
+                        onClick={() => setLightboxImage(artwork)}
+                      />
+                    ))}
+                </div>
+              </div>
             )}
-            {activeCategory === "vibrant" && (
-              <SectionLabel>Vibrant India 2026 Brochures</SectionLabel>
+
+            {/* 2. Vibrant India 2026 Brochures (SECOND - SWAPPED) */}
+            {displayBrochures.length > 0 && (
+              <div className="mb-12">
+                <SectionLabel>Vibrant India 2026 Brochures</SectionLabel>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {displayBrochures.map(b => (
+                    <BrochureCard key={b.id} brochure={b} onOpen={setActivePdf} />
+                  ))}
+                </div>
+              </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {displayBrochures.map(b => (
-                <BrochureCard key={b.id} brochure={b} onOpen={setActivePdf} />
-              ))}
-            </div>
           </div>
-        )}
+        ) : (
+          /* ALL OTHER CATEGORIES */
+          <div>
+            {/* Brochures (shown for "print" and "brochure" filters) */}
+            {showBrochures && (
+              <div className="mb-12">
+                {activeCategory === "print" && (
+                  <SectionLabel>Brochures & Publications</SectionLabel>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {displayBrochures.map(b => (
+                    <BrochureCard key={b.id} brochure={b} onOpen={setActivePdf} />
+                  ))}
+                </div>
+              </div>
+            )}
 
-        {/* Sub-headers for artwork section */}
-        {activeCategory === "print" && filteredArtworks.length > 0 && (
-          <SectionLabel>Stencil Art</SectionLabel>
-        )}
-        {activeCategory === "vibrant" && filteredArtworks.length > 0 && (
-          <SectionLabel>Magazine & Exhibition Designs</SectionLabel>
-        )}
+            {/* Stencil sub-header when print tab is active */}
+            {activeCategory === "print" && filteredArtworks.length > 0 && (
+              <SectionLabel>Stencil Art</SectionLabel>
+            )}
 
-        {/* ARTWORK MASONRY */}
-        {visibleArtworks.length > 0 && (
-          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
-            {visibleArtworks
-              .filter(a => a.title !== "L10")
-              .map(artwork => (
-                <ArtCard
-                  key={artwork.id}
-                  artwork={artwork}
-                  onClick={() => setLightboxImage(artwork)}
-                />
-              ))}
+            {/* ARTWORK HORIZONTAL GRID (Left-to-Right Horizontal Sequence) */}
+            {visibleArtworks.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-start">
+                {visibleArtworks
+                  .filter(a => a.title !== "L10")
+                  .map(artwork => (
+                    <ArtCard
+                      key={artwork.id}
+                      artwork={artwork}
+                      onClick={() => setLightboxImage(artwork)}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -809,7 +841,7 @@ function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }
   const needsLightBg = TRANSPARENT_CELEBS_ARR.includes(artwork.image);
   return (
     <div
-      className="break-inside-avoid mb-5 group relative cursor-pointer rounded-2xl overflow-hidden
+      className="group relative cursor-pointer rounded-2xl overflow-hidden w-full
                  bg-white/85 backdrop-blur-md border border-white/90 shadow-sm
                  hover:shadow-2xl hover:shadow-purple-500/15 hover:-translate-y-1.5 transition-all duration-300"
       onClick={onClick}
