@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { 
-  X, Layers, Megaphone, Hexagon, BookOpen, Palette, Layout,
-  Heart, FileText, Download, ExternalLink, ChevronDown
+import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  X, ChevronDown, Download, ExternalLink, FileText, ZoomIn
 } from "lucide-react";
 
+/* ─────────────────────────── interfaces ─────────────────────────── */
 interface Artwork {
   id: number;
   title: string;
@@ -18,1765 +18,719 @@ interface Brochure {
   title: string;
   subtitle: string;
   file: string;
-  color: string;
+  color: string;         // kept for badge accent
+  accentFrom: string;    // tailwind gradient start
+  accentTo: string;      // tailwind gradient end
   cover: string;
 }
 
+/* ─────────────────────────── brochure data ──────────────────────── */
 const brochures: Brochure[] = [
-  { id: 5, title: "SweetVerse", subtitle: "Brochure", file: "/Assets/Brochure/SweetVerse  Brochure.pdf", color: "from-orange-500 to-amber-600", cover: "/Assets/Brochure/cover_SweetVerse  Brochure.pdf.jpg" },
-  { id: 8, title: "VIT Brochure", subtitle: "Institute Brochure", file: "/Assets/Brochure/VIT Brochure (1).pdf", color: "from-red-600 to-rose-800", cover: "/Assets/Brochure/cover_VIT Brochure (1).pdf.jpg" },
-  { id: 6, title: "Vibrant India 2026", subtitle: "Exhibition Brochure", file: "/Assets/Brochure/Vibrant_India_2026_Exhibition_Brochure (2).pdf", color: "from-[#a033ff] to-[#ff3388]", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Exhibition_Brochure (2).pdf.jpg" },
-  { id: 7, title: "Vibrant India 2026", subtitle: "Stainless Steel Conference", file: "/Assets/Brochure/Vibrant_India_2026_Stainless_Steel_Conference (1).pdf", color: "from-slate-500 to-zinc-700", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Stainless_Steel_Conference (1).pdf.jpg" },
-  { id: 9, title: "Website Development", subtitle: "Services", file: "/Assets/Brochure/Website Development (1).pdf", color: "from-indigo-600 to-blue-800", cover: "/Assets/Brochure/cover_Website Development (1).pdf.jpg" },
-  { id: 1, title: "Catalog Design", subtitle: "& Product Photography", file: "/Assets/Brochure/CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf", color: "from-violet-600 to-purple-800", cover: "/Assets/Brochure/cover_CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf.jpg" },
-  { id: 2, title: "Mobile App", subtitle: "Development", file: "/Assets/Brochure/Mobile App Development (1).pdf", color: "from-blue-600 to-cyan-700", cover: "/Assets/Brochure/cover_Mobile App Development (1).pdf.jpg" },
-  { id: 3, title: "Other Services", subtitle: "Portfolio", file: "/Assets/Brochure/Other Services  (1).pdf", color: "from-emerald-600 to-teal-700", cover: "/Assets/Brochure/cover_Other Services  (1).pdf.jpg" },
-  { id: 4, title: "Social Media Management", subtitle: "& Digital Marketing", file: "/Assets/Brochure/Social Media Management & Digital Marketing (1).pdf", color: "from-pink-600 to-rose-700", cover: "/Assets/Brochure/cover_Social Media Management & Digital Marketing (1).pdf.jpg" },
+  { id: 5,  title: "SweetVerse",        subtitle: "Brand Brochure",             file: "/Assets/Brochure/SweetVerse  Brochure.pdf",                               color: "from-orange-500 to-amber-600",   accentFrom: "#f97316", accentTo: "#d97706", cover: "/Assets/Brochure/cover_SweetVerse  Brochure.pdf.jpg" },
+  { id: 8,  title: "VIT Brochure",      subtitle: "Institute Brochure",          file: "/Assets/Brochure/VIT Brochure (1).pdf",                                   color: "from-red-600 to-rose-800",       accentFrom: "#dc2626", accentTo: "#9f1239", cover: "/Assets/Brochure/cover_VIT Brochure (1).pdf.jpg" },
+  { id: 6,  title: "Vibrant India 2026",subtitle: "Exhibition Brochure",         file: "/Assets/Brochure/Vibrant_India_2026_Exhibition_Brochure (2).pdf",         color: "from-[#a033ff] to-[#ff3388]",   accentFrom: "#a033ff", accentTo: "#ff3388", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Exhibition_Brochure (2).pdf.jpg" },
+  { id: 7,  title: "Vibrant India 2026",subtitle: "Stainless Steel Conference",  file: "/Assets/Brochure/Vibrant_India_2026_Stainless_Steel_Conference (1).pdf",  color: "from-slate-500 to-zinc-700",     accentFrom: "#64748b", accentTo: "#3f3f46", cover: "/Assets/Brochure/cover_Vibrant_India_2026_Stainless_Steel_Conference (1).pdf.jpg" },
+  { id: 9,  title: "Website Development",subtitle: "Services Brochure",         file: "/Assets/Brochure/Website Development (1).pdf",                            color: "from-indigo-600 to-blue-800",    accentFrom: "#4f46e5", accentTo: "#1e40af", cover: "/Assets/Brochure/cover_Website Development (1).pdf.jpg" },
+  { id: 1,  title: "Catalog Design",    subtitle: "& Product Photography",       file: "/Assets/Brochure/CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf",           color: "from-violet-600 to-purple-800",  accentFrom: "#7c3aed", accentTo: "#6b21a8", cover: "/Assets/Brochure/cover_CATALOG DESIGN & PRODUCT PHOTOGRAPHY (1).pdf.jpg" },
+  { id: 2,  title: "Mobile App",        subtitle: "Development",                 file: "/Assets/Brochure/Mobile App Development (1).pdf",                         color: "from-blue-600 to-cyan-700",      accentFrom: "#2563eb", accentTo: "#0e7490", cover: "/Assets/Brochure/cover_Mobile App Development (1).pdf.jpg" },
+  { id: 3,  title: "Other Services",    subtitle: "Portfolio",                   file: "/Assets/Brochure/Other Services  (1).pdf",                                color: "from-emerald-600 to-teal-700",   accentFrom: "#059669", accentTo: "#0f766e", cover: "/Assets/Brochure/cover_Other Services  (1).pdf.jpg" },
+  { id: 4,  title: "Social Media Mgmt", subtitle: "& Digital Marketing",         file: "/Assets/Brochure/Social Media Management & Digital Marketing (1).pdf",    color: "from-pink-600 to-rose-700",      accentFrom: "#db2777", accentTo: "#be123c", cover: "/Assets/Brochure/cover_Social Media Management & Digital Marketing (1).pdf.jpg" },
 ];
 
+/* ─────────────────────────── category config ────────────────────── */
+
+// Granular old category → broad display label
+const CATEGORY_MAP: Record<string, string> = {
+  socialmedia: "Social Media",
+  group:       "LFA Club Projects",
+  certificate: "Certificates",
+  Logo:        "Branding & Logos",
+  brochure:    "Brochures",
+  stencil:     "Stencil",
+  handmade:    "Handmade Art",
+  celebrity:   "Celebrity Portraits",
+  caricature:  "Caricatures",
+  oilpainting: "Digital Oil Painting",
+  UIUX:        "UI/UX Design",
+  digital:     "Order Works",
+};
+
+// Visible filter IDs
+const MAIN_FILTERS = ["all", "socialmedia", "print"] as const;
+
+const DROPDOWN_CATEGORIES = [
+  { id: "Logo",        label: "Branding & Logos" },
+  { id: "digital",     label: "Order Works / Commissions" },
+  { id: "UIUX",        label: "UI/UX Design" },
+  { id: "handmade",    label: "Handmade Art" },
+  { id: "celebrity",   label: "Celebrity Portraits" },
+  { id: "caricature",  label: "Caricatures" },
+  { id: "oilpainting", label: "Digital Oil Painting" },
+  { id: "stencil",     label: "Stencil" },
+  { id: "brochure",    label: "Brochures" },
+  { id: "certificate", label: "Certificates" },
+  { id: "group",       label: "LFA Club Projects" },
+];
+
+/* cells that need a light background because the artwork is transparent */
+const TRANSPARENT_CELEBS = new Set([
+  "/Assets/celeb/4 ravi kishan.webp",
+  "/Assets/celeb/6 anand mahindra digital artwork.webp",
+  "/Assets/celeb/8 vivek ranjan digital art.webp",
+]);
+
+/* ═══════════════════════════ MAIN COMPONENT ════════════════════════ */
 function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const [lightboxImage, setLightboxImage] = useState<Artwork | null>(null);
-  const [activePdf, setActivePdf] = useState<Brochure | null>(null);
-  const [visibleCount, setVisibleCount] = useState(24);
+  const [dropdownOpen, setDropdownOpen]     = useState(false);
+  const [lightboxImage, setLightboxImage]   = useState<Artwork | null>(null);
+  const [activePdf, setActivePdf]           = useState<Brochure | null>(null);
+  const [visibleCount, setVisibleCount]     = useState(18);
 
-  // ── Six broad filters ──────────────────────────────────────────────────────
-  const categories = [
-    { id: "all",          label: "All Work",               icon: <Layers size={15} /> },
-    { id: "social",       label: "Social & Advertising",   icon: <Megaphone size={15} /> },
-    { id: "branding",     label: "Branding & Logos",       icon: <Hexagon size={15} /> },
-    { id: "print",        label: "Print & Editorial",      icon: <BookOpen size={15} /> },
-    { id: "illustration", label: "Illustration & Portraits",icon: <Palette size={15} /> },
-    { id: "digital",      label: "Digital & UI/UX",        icon: <Layout size={15} /> },
-  ];
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ── Maps old categories to new broad ones ──────────────────────────────────
-  const categoryMap: Record<string, string> = {
-    // Social & Advertising
-    socialmedia: "social",
-    group:       "social",   // LFA Club Projects (campaign / event posts)
-    certificate: "social",   // Certificate designs (print deliverables for events)
-    // Branding & Logos
-    Logo:        "branding",
-    // Print & Editorial
-    brochure:    "print",
-    stencil:     "print",
-    // Illustration & Portraits
-    handmade:    "illustration",
-    celebrity:   "illustration",
-    caricature:  "illustration",
-    oilpainting: "illustration",
-    // Digital & UI/UX
-    UIUX:        "digital",
-    digital:     "digital",  // Order Works (digital commissions)
-  };
+  /* close dropdown on outside click */
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
 
+  /* ESC closes modals */
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setLightboxImage(null);
+        setActivePdf(null);
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const selectCategory = useCallback((id: string) => {
+    setActiveCategory(id);
+    setVisibleCount(18);
+    setDropdownOpen(false);
+  }, []);
+
+  /* label helper */
+  const activeLabel =
+    activeCategory === "all" ? "All Work"
+    : activeCategory === "socialmedia" ? "Social Media"
+    : activeCategory === "print" ? "Print & Editorial"
+    : DROPDOWN_CATEGORIES.find(d => d.id === activeCategory)?.label ?? "All Work";
+
+  const isMoreActive = DROPDOWN_CATEGORIES.some(d => d.id === activeCategory);
+
+  /* ─────── artwork data ──────────────────────────────────────────── */
   const artworks: Artwork[] = [
-  {
-    "id": 261,
-    "title": "Social Media Post",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/d1.png"
-  },
-  {
-    "id": 262,
-    "title": "Social Media Post",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/d2.png"
-  },
-  {
-    "id": 1,
-    "title": "1 Social Media Post",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/1 Social Media Post.webp"
-  },
-  {
-    "id": 2,
-    "title": "2 Sonu Nigam Concert Post",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/2 Sonu Nigam Concert Post.webp"
-  },
-  {
-    "id": 3,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/3.webp"
-  },
-  {
-    "id": 4,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/4.webp"
-  },
-  {
-    "id": 5,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/5.webp"
-  },
-  {
-    "id": 6,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/6.webp"
-  },
-  {
-    "id": 7,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/7.webp"
-  },
-  {
-    "id": 8,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/8.webp"
-  },
-  {
-    "id": 9,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/9.webp"
-  },
-
-  {
-    "id": 11,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/11.webp"
-  },
-  {
-    "id": 12,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/12.webp"
-  },
-  {
-    "id": 13,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/13.webp"
-  },
-  {
-    "id": 14,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/15.webp"
-  },
-  {
-    "id": 15,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/16.webp"
-  },
-  {
-    "id": 16,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/17.webp"
-  },
-  {
-    "id": 17,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/18.webp"
-  },
-  {
-    "id": 18,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/19.webp"
-  },
-
-  {
-    "id": 20,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/21.webp"
-  },
-  {
-    "id": 21,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/22.webp"
-  },
-  {
-    "id": 22,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/23.webp"
-  },
-  {
-    "id": 23,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/24.webp"
-  },
-  {
-    "id": 24,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/Screenshot 2026-05-28 230223.webp"
-  },
-  {
-    "id": 25,
-    "title": "Social Media Design Project",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/Screenshot 2026-05-28 230302.webp"
-  },
-  {
-    "id": 26,
-    "title": "Task2 5",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/task2-5.webp"
-  },
-
-  {
-    "id": 263,
-    "title": "Social Media Post",
-    "category": "socialmedia",
-    "medium": "Social Media Design",
-    "description": "Beautiful social media design project.",
-    "image": "/Assets/Social Media/2d8987c7-b5d5-4ee9-bfc4-9cd74f1abe46.png"
-  },
-  {
-    "id": 27,
-    "title": "Oil Painting",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/.oil painting.webp"
-  },
-  {
-    "id": 28,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/1.webp"
-  },
-  {
-    "id": 29,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/2.webp"
-  },
-  {
-    "id": 30,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/3.webp"
-  },
-  {
-    "id": 31,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/04.webp"
-  },
-  {
-    "id": 32,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/5.webp"
-  },
-  {
-    "id": 33,
-    "title": "6 Order Work",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/6 Order Work..webp"
-  },
-  {
-    "id": 34,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/6.webp"
-  },
-  {
-    "id": 35,
-    "title": "7 Order Work",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/7 Order Work...webp"
-  },
-  {
-    "id": 36,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/7.webp"
-  },
-  {
-    "id": 37,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/8.webp"
-  },
-  {
-    "id": 38,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/9.webp"
-  },
-  {
-    "id": 39,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/10.webp"
-  },
-  {
-    "id": 40,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/11.webp"
-  },
-  {
-    "id": 41,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/12.webp"
-  },
-  {
-    "id": 42,
-    "title": "Digital Art Project",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/13.webp"
-  },
-  {
-    "id": 43,
-    "title": "B14",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/b14.webp"
-  },
-  {
-    "id": 44,
-    "title": "Caricature Odrer Work",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/Caricature Odrer Work.webp"
-  },
-  {
-    "id": 45,
-    "title": "INDORE ODRDER WORK",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/INDORE ODRDER WORK.webp"
-  },
-  {
-    "id": 46,
-    "title": "INDORE OREDR WORK",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/INDORE OREDR WORK.webp"
-  },
-  {
-    "id": 47,
-    "title": "Oil Painting",
-    "category": "digital",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/order/oil painting.webp"
-  },
-  {
-    "id": 48,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/1.webp"
-  },
-  {
-    "id": 49,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/3.webp"
-  },
-  {
-    "id": 50,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/4.webp"
-  },
-  {
-    "id": 51,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/5.webp"
-  },
-  {
-    "id": 52,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/6.webp"
-  },
-  {
-    "id": 53,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/7.webp"
-  },
-  {
-    "id": 54,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/8.webp"
-  },
-  {
-    "id": 55,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/9.webp"
-  },
-  {
-    "id": 56,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/11.webp"
-  },
-  {
-    "id": 57,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/12.webp"
-  },
-  {
-    "id": 58,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/57e62ed2-3f68-42d7-908f-92362e5bc44e.webp"
-  },
-  {
-    "id": 59,
-    "title": "ANIME",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/ANIME.webp"
-  },
-  {
-    "id": 60,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/e1f99109-7405-4b5c-835f-32861b1c0e3d.webp"
-  },
-  {
-    "id": 61,
-    "title": "INDORE ODRDER WORK",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/INDORE ODRDER WORK.webp"
-  },
-  {
-    "id": 62,
-    "title": "INDORE OREDR WORK",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/INDORE OREDR WORK.webp"
-  },
-  {
-    "id": 63,
-    "title": "JONY DEEP",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/JONY DEEP.webp"
-  },
-  {
-    "id": 64,
-    "title": "KGF",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/KGF.webp"
-  },
-  {
-    "id": 65,
-    "title": "PATHAAN",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/PATHAAN.webp"
-  },
-  {
-    "id": 66,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.28.webp"
-  },
-  {
-    "id": 67,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.29 (1).webp"
-  },
-  {
-    "id": 68,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.29.webp"
-  },
-  {
-    "id": 69,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.15.17.webp"
-  },
-  {
-    "id": 70,
-    "title": "Traditional Art Project",
-    "category": "handmade",
-    "medium": "Traditional Art",
-    "description": "Beautiful traditional art project.",
-    "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.15.18.webp"
-  },
-  {
-    "id": 71,
-    "title": "LFA Project 1",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/1.webp"
-  },
-  {
-    "id": 72,
-    "title": "LFA Project 2",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/2.webp"
-  },
-  {
-    "id": 73,
-    "title": "LFA Project 3",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/3.webp"
-  },
-  {
-    "id": 74,
-    "title": "LFA Project 4",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/4.webp"
-  },
-  {
-    "id": 75,
-    "title": "LFA Project 5",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/5.webp"
-  },
-  {
-    "id": 76,
-    "title": "LFA Project 6",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/6.webp"
-  },
-  {
-    "id": 77,
-    "title": "LFA Project 7",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/7.webp"
-  },
-  {
-    "id": 78,
-    "title": "LFA Project 8",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/8.webp"
-  },
-  {
-    "id": 79,
-    "title": "LFA Project 9",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/9.webp"
-  },
-  {
-    "id": 80,
-    "title": "LFA Project 10",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/10.webp"
-  },
-  {
-    "id": 81,
-    "title": "LFA Project 11",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/11.webp"
-  },
-  {
-    "id": 82,
-    "title": "LFA Project 12",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/12.webp"
-  },
-  {
-    "id": 83,
-    "title": "LFA Project 13",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/13.webp"
-  },
-  {
-    "id": 831,
-    "title": "LFA Project 14",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/14.webp"
-  },
-  {
-    "id": 832,
-    "title": "LFA Project 15",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/15.webp"
-  },
-  {
-    "id": 833,
-    "title": "LFA Project 16",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/16.webp"
-  },
-  {
-    "id": 834,
-    "title": "LFA Project 17",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/17.webp"
-  },
-  {
-    "id": 835,
-    "title": "LFA Project L2",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/l2.webp"
-  },
-  {
-    "id": 836,
-    "title": "LFA Project L14",
-    "category": "group",
-    "medium": "Graphic Design",
-    "description": "LFA Club Project image.",
-    "image": "/Assets/LFA/l14.webp"
-  },
-  {
-    "id": 84,
-    "title": "1 Emraan Hasmi",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/1 Emraan Hasmi.webp"
-  },
-  {
-    "id": 85,
-    "title": "3 Virat Kholi",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/3 virat kholi.webp"
-  },
-  {
-    "id": 86,
-    "title": "4 Ravi Kishan",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/4 ravi kishan.webp"
-  },
-  {
-    "id": 87,
-    "title": "5 Sheni Vidya Balan",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/5 Sheni Vidya balan.webp"
-  },
-  {
-    "id": 88,
-    "title": "6 Anand Mahindra Digital Artwork",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/6 anand mahindra digital artwork.webp"
-  },
-  {
-    "id": 89,
-    "title": "7 Sonu Sood",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/7 sonu sood.webp"
-  },
-  {
-    "id": 90,
-    "title": "8 Vivek Ranjan Digital Art",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/8 vivek ranjan digital art.webp"
-  },
-  {
-    "id": 91,
-    "title": "9 Digital Policition Work",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/9 Digital policition work.webp"
-  },
-  {
-    "id": 92,
-    "title": "B10",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/b10.webp"
-  },
-  {
-    "id": 93,
-    "title": "Digital Vector Art",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/Digital Vector Art.webp"
-  },
-  {
-    "id": 94,
-    "title": "Fakt Mahilao Mate",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/fakt mahilao mate.webp"
-  },
-  {
-    "id": 95,
-    "title": "Forged In Fire",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/Forged in Fire.webp"
-  },
-  {
-    "id": 96,
-    "title": "SRK Jawan Poster",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/SRK Jawan Poster.webp"
-  },
-  {
-    "id": 97,
-    "title": "The Family Man",
-    "category": "celebrity",
-    "medium": "Digital Art",
-    "description": "Beautiful digital art project.",
-    "image": "/Assets/celeb/The Family Man.webp"
-  },
-  {
-    "id": 98,
-    "title": "1 Laughter Chef",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/1 Laughter Chef.webp"
-  },
-  {
-    "id": 99,
-    "title": "2 Laughter Chef",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/2 Laughter Chef.webp"
-  },
-  {
-    "id": 100,
-    "title": "6 Order Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/6 Order Work..webp"
-  },
-  {
-    "id": 101,
-    "title": "7 Order Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/7 Order Work...webp"
-  },
-  {
-    "id": 102,
-    "title": "8 Brijendra Kala Bollywood Actor",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/8 Brijendra Kala bollywood actor.webp"
-  },
-  {
-    "id": 103,
-    "title": "9 Gajraj Rao Bollywood Actor",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/9 Gajraj Rao bollywood actor.webp"
-  },
-  {
-    "id": 104,
-    "title": "10 Caricature Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/10 Caricature work.webp"
-  },
-  {
-    "id": 105,
-    "title": "11 Caricature Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/11 Caricature work.webp"
-  },
-  {
-    "id": 106,
-    "title": "12 Caricature Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/12 Caricature work.webp"
-  },
-  {
-    "id": 107,
-    "title": "13 Pawan Deep Caricature Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/13 Pawan Deep Caricature Work.webp"
-  },
-  {
-    "id": 108,
-    "title": "Caricature Odrer Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/Caricature Odrer Work.webp"
-  },
-  {
-    "id": 109,
-    "title": "Caricature Work",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/Caricature Work.webp"
-  },
-  {
-    "id": 110,
-    "title": "Emran",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/emran.webp"
-  },
-  {
-    "id": 111,
-    "title": "New Caricature Art For & 😃I Hope You Like It ❤️",
-    "category": "caricature",
-    "medium": "Digital Caricature",
-    "description": "Beautiful digital caricature project.",
-    "image": "/Assets/caricature/New caricature art for @sanjeevkapoor & @alyonakapoor 😃I hope you like it ❤️Dm me for order wor.webp"
-  },
-  {
-    "id": 112,
-    "title": "1 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/1 oil painting.webp"
-  },
-  {
-    "id": 113,
-    "title": "3 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/3  oil painting.webp"
-  },
-  {
-    "id": 114,
-    "title": "4 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/4  oil painting.webp"
-  },
-  {
-    "id": 115,
-    "title": "5 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/5  oil painting.webp"
-  },
-  {
-    "id": 116,
-    "title": "6 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/6 oil painting.webp"
-  },
-  {
-    "id": 117,
-    "title": "7 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/7 oil painting.webp"
-  },
-  {
-    "id": 118,
-    "title": "8 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/8 oil painting.webp"
-  },
-  {
-    "id": 119,
-    "title": "9 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/9 oil painting.webp"
-  },
-  {
-    "id": 120,
-    "title": "10 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/10 oil painting.webp"
-  },
-  {
-    "id": 121,
-    "title": "11 Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/11 oil painting.webp"
-  },
-  {
-    "id": 122,
-    "title": "Oil Painting",
-    "category": "oilpainting",
-    "medium": "Digital Oil Painting",
-    "description": "Beautiful digital oil painting project.",
-    "image": "/Assets/oil/Oil Painting.webp"
-  },
-  {
-    "id": 123,
-    "title": "ChatGPT Image Mar 8, 2026, 04 21 31 PM",
-    "category": "Logo",
-    "medium": "Logo Design",
-    "description": "Beautiful logo design project.",
-    "image": "/Assets/Logos/ChatGPT Image Mar 8, 2026, 04_21_31 PM.webp"
-  },
-  {
-    "id": 124,
-    "title": "Crypto Habibi Logo",
-    "category": "Logo",
-    "medium": "Logo Design",
-    "description": "Beautiful logo design project.",
-    "image": "/Assets/Logos/Crypto Habibi Logo.webp"
-  },
-  {
-    "id": 125,
-    "title": "Logo Design Project",
-    "category": "Logo",
-    "medium": "Logo Design",
-    "description": "Beautiful logo design project.",
-    "image": "/Assets/Logos/freepik__professional-vector-logo-for-enagar-representing-s__50600.webp"
-  },
-  {
-    "id": 126,
-    "title": "L14",
-    "category": "Logo",
-    "medium": "Logo Design",
-    "description": "Beautiful logo design project.",
-    "image": "/Assets/Logos/l14.webp"
-  },
-  {
-    "id": 127,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/4.webp"
-  },
-  {
-    "id": 128,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/5.webp"
-  },
-  {
-    "id": 129,
-    "title": "Antim Postar",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/Antim postar.webp"
-  },
-  {
-    "id": 130,
-    "title": "B4",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/b4.webp"
-  },
-  {
-    "id": 131,
-    "title": "B12",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/b12.webp"
-  },
-  {
-    "id": 132,
-    "title": "B13",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/b13.webp"
-  },
-  {
-    "id": 133,
-    "title": "B15",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/b15.webp"
-  },
-  {
-    "id": 134,
-    "title": "FINAL WORK OF TKF",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/FINAL WORK OF TKF.webp"
-  },
-  {
-    "id": 135,
-    "title": "Goro",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/goro.webp"
-  },
-  {
-    "id": 136,
-    "title": "PicsArt 07 10 09 43 36",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/PicsArt_07-10-09.43.36.webp"
-  },
-  {
-    "id": 137,
-    "title": "S2",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/s2.webp"
-  },
-  {
-    "id": 138,
-    "title": "S5",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/s5.webp"
-  },
-  {
-    "id": 139,
-    "title": "S6",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/s6.webp"
-  },
-  {
-    "id": 140,
-    "title": "S10",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/s10.webp"
-  },
-  {
-    "id": 141,
-    "title": "Stencil 2 (1)",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/stencil 2 (1).webp"
-  },
-  {
-    "id": 142,
-    "title": "Stencil 2 (2)",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/stencil 2 (2).webp"
-  },
-  {
-    "id": 143,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20210721_161044.webp"
-  },
-  {
-    "id": 144,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20210922_154932.webp"
-  },
-  {
-    "id": 145,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20211219_102700.webp"
-  },
-  {
-    "id": 146,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20220108_164305.webp"
-  },
-  {
-    "id": 147,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20220108_164434.webp"
-  },
-  {
-    "id": 148,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20220109_191628.webp"
-  },
-  {
-    "id": 149,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20220421_121800.webp"
-  },
-  {
-    "id": 150,
-    "title": "Digital Stencil Project",
-    "category": "stencil",
-    "medium": "Digital Stencil",
-    "description": "Beautiful digital stencil project.",
-    "image": "/Assets/stencil/yeswecan_20220425_084324.webp"
-  },
-  {
-    "id": 151,
-    "title": "Cinemood Website",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Cinemood Website.webp"
-  },
-  {
-    "id": 152,
-    "title": "MediScope",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/MediScope.webp"
-  },
-  {
-    "id": 153,
-    "title": "Mobile App Deign 1",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Mobile App Deign  1.webp"
-  },
-  {
-    "id": 154,
-    "title": "Mobile App Deign 3",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Mobile App Deign  3.webp"
-  },
-  {
-    "id": 155,
-    "title": "Mobile App Deign 2",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Mobile App Deign 2.webp"
-  },
-  {
-    "id": 156,
-    "title": "Renteeasy Hero Section",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Renteeasy Hero section.webp"
-  },
-  {
-    "id": 157,
-    "title": "ReWear",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/ReWear.webp"
-  },
-  {
-    "id": 158,
-    "title": "UI/UX Design Project",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Screenshot 2026-05-30 164438.webp"
-  },
-  {
-    "id": 159,
-    "title": "UI/UX Design Project",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Screenshot 2026-05-30 164515.webp"
-  },
-  {
-    "id": 160,
-    "title": "UI/UX Design Project",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/Screenshot 2026-05-30 164543.webp"
-  },
-  {
-    "id": 161,
-    "title": "Ui1",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/ui1.webp"
-  },
-  {
-    "id": 162,
-    "title": "Ui2",
-    "category": "UIUX",
-    "medium": "UI/UX Design",
-    "description": "Beautiful ui/ux design project.",
-    "image": "/Assets/uiux/ui2.webp"
-  },
-  {
-    "id": 163,
-    "title": "Certificate Coordinator",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/Certificate Coordinator.webp"
-  },
-  {
-    "id": 164,
-    "title": "Certificate Core Member",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/Certificate Core Member.webp"
-  },
-  {
-    "id": 165,
-    "title": "Certificate Volunteer",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/Certificate Volunteer.webp"
-  },
-  {
-    "id": 166,
-    "title": "Hackovate Certificate 1",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/Hackovate Certificate 1.webp"
-  },
-  {
-    "id": 167,
-    "title": "Hackovate Certificate 2",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/Hackovate Certificate 2.webp"
-  },
-  {
-    "id": 168,
-    "title": "LFA Issue 22 Certifiacte 1",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/LFA Issue 22 Certifiacte  1.webp"
-  },
-  {
-    "id": 169,
-    "title": "LFA Issue 22 Certifiacte 2",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 2.webp"
-  },
-  {
-    "id": 170,
-    "title": "LFA Issue 22 Certifiacte 3",
-    "category": "certificate",
-    "medium": "Certificate Design",
-    "description": "Beautiful certificate design project.",
-    "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 3.webp"
-  }
+  { "id": 261, "title": "Social Media Post",        "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/d1.png" },
+  { "id": 262, "title": "Social Media Post",        "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/d2.png" },
+  { "id": 1,   "title": "1 Social Media Post",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/1 Social Media Post.webp" },
+  { "id": 2,   "title": "2 Sonu Nigam Concert Post","category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/2 Sonu Nigam Concert Post.webp" },
+  { "id": 3,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/3.webp" },
+  { "id": 4,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/4.webp" },
+  { "id": 5,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/5.webp" },
+  { "id": 6,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/6.webp" },
+  { "id": 7,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/7.webp" },
+  { "id": 8,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/8.webp" },
+  { "id": 9,   "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/9.webp" },
+  { "id": 11,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/11.webp" },
+  { "id": 12,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/12.webp" },
+  { "id": 13,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/13.webp" },
+  { "id": 14,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/15.webp" },
+  { "id": 15,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/16.webp" },
+  { "id": 16,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/17.webp" },
+  { "id": 17,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/18.webp" },
+  { "id": 18,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/19.webp" },
+  { "id": 20,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/21.webp" },
+  { "id": 21,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/22.webp" },
+  { "id": 22,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/23.webp" },
+  { "id": 23,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/24.webp" },
+  { "id": 24,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/Screenshot 2026-05-28 230223.webp" },
+  { "id": 25,  "title": "Social Media Design",      "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/Screenshot 2026-05-28 230302.webp" },
+  { "id": 26,  "title": "Task2 5",                  "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/task2-5.webp" },
+  { "id": 263, "title": "Social Media Post",        "category": "socialmedia",  "medium": "Social Media Design",     "description": "Social media design project.",          "image": "/Assets/Social Media/2d8987c7-b5d5-4ee9-bfc4-9cd74f1abe46.png" },
+  { "id": 27,  "title": "Oil Painting",             "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/.oil painting.webp" },
+  { "id": 28,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/1.webp" },
+  { "id": 29,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/2.webp" },
+  { "id": 30,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/3.webp" },
+  { "id": 31,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/04.webp" },
+  { "id": 32,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/5.webp" },
+  { "id": 33,  "title": "6 Order Work",             "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/6 Order Work..webp" },
+  { "id": 34,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/6.webp" },
+  { "id": 35,  "title": "7 Order Work",             "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/7 Order Work...webp" },
+  { "id": 36,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/7.webp" },
+  { "id": 37,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/8.webp" },
+  { "id": 38,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/9.webp" },
+  { "id": 39,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/10.webp" },
+  { "id": 40,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/11.webp" },
+  { "id": 41,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/12.webp" },
+  { "id": 42,  "title": "Digital Art Project",      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/13.webp" },
+  { "id": 43,  "title": "B14",                      "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/b14.webp" },
+  { "id": 44,  "title": "Caricature Order Work",    "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/Caricature Odrer Work.webp" },
+  { "id": 45,  "title": "Indore Order Work",        "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/INDORE ODRDER WORK.webp" },
+  { "id": 46,  "title": "Indore Order Work",        "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/INDORE OREDR WORK.webp" },
+  { "id": 47,  "title": "Oil Painting",             "category": "digital",       "medium": "Digital Art",             "description": "Digital art project.",                  "image": "/Assets/order/oil painting.webp" },
+  { "id": 48,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/1.webp" },
+  { "id": 49,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/3.webp" },
+  { "id": 50,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/4.webp" },
+  { "id": 51,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/5.webp" },
+  { "id": 52,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/6.webp" },
+  { "id": 53,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/7.webp" },
+  { "id": 54,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/8.webp" },
+  { "id": 55,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/9.webp" },
+  { "id": 56,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/11.webp" },
+  { "id": 57,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/12.webp" },
+  { "id": 58,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/57e62ed2-3f68-42d7-908f-92362e5bc44e.webp" },
+  { "id": 59,  "title": "Anime Art",                "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/ANIME.webp" },
+  { "id": 60,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/e1f99109-7405-4b5c-835f-32861b1c0e3d.webp" },
+  { "id": 61,  "title": "Indore Order Work",        "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/INDORE ODRDER WORK.webp" },
+  { "id": 62,  "title": "Indore Order Work",        "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/INDORE OREDR WORK.webp" },
+  { "id": 63,  "title": "Johnny Depp",              "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/JONY DEEP.webp" },
+  { "id": 64,  "title": "KGF",                      "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/KGF.webp" },
+  { "id": 65,  "title": "Pathaan",                  "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/PATHAAN.webp" },
+  { "id": 66,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.28.webp" },
+  { "id": 67,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.29 (1).webp" },
+  { "id": 68,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.09.29.webp" },
+  { "id": 69,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.15.17.webp" },
+  { "id": 70,  "title": "Traditional Art",          "category": "handmade",      "medium": "Traditional Art",         "description": "Traditional art project.",               "image": "/Assets/Handmade/WhatsApp Image 2026-05-30 at 16.15.18.webp" },
+  { "id": 71,  "title": "LFA Project 1",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/1.webp" },
+  { "id": 72,  "title": "LFA Project 2",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/2.webp" },
+  { "id": 73,  "title": "LFA Project 3",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/3.webp" },
+  { "id": 74,  "title": "LFA Project 4",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/4.webp" },
+  { "id": 75,  "title": "LFA Project 5",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/5.webp" },
+  { "id": 76,  "title": "LFA Project 6",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/6.webp" },
+  { "id": 77,  "title": "LFA Project 7",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/7.webp" },
+  { "id": 78,  "title": "LFA Project 8",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/8.webp" },
+  { "id": 79,  "title": "LFA Project 9",            "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/9.webp" },
+  { "id": 80,  "title": "LFA Project 10",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/10.webp" },
+  { "id": 81,  "title": "LFA Project 11",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/11.webp" },
+  { "id": 82,  "title": "LFA Project 12",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/12.webp" },
+  { "id": 83,  "title": "LFA Project 13",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/13.webp" },
+  { "id": 831, "title": "LFA Project 14",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/14.webp" },
+  { "id": 832, "title": "LFA Project 15",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/15.webp" },
+  { "id": 833, "title": "LFA Project 16",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/16.webp" },
+  { "id": 834, "title": "LFA Project 17",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/17.webp" },
+  { "id": 835, "title": "LFA Project L2",           "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/l2.webp" },
+  { "id": 836, "title": "LFA Project L14",          "category": "group",         "medium": "Graphic Design",          "description": "LFA Club Project.",                     "image": "/Assets/LFA/l14.webp" },
+  { "id": 84,  "title": "Emraan Hashmi",            "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/1 Emraan Hasmi.webp" },
+  { "id": 85,  "title": "Virat Kohli",              "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/3 virat kholi.webp" },
+  { "id": 86,  "title": "Ravi Kishan",              "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/4 ravi kishan.webp" },
+  { "id": 87,  "title": "Vidya Balan",              "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/5 Sheni Vidya balan.webp" },
+  { "id": 88,  "title": "Anand Mahindra",           "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/6 anand mahindra digital artwork.webp" },
+  { "id": 89,  "title": "Sonu Sood",                "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/7 sonu sood.webp" },
+  { "id": 90,  "title": "Vivek Ranjan Digital Art", "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/8 vivek ranjan digital art.webp" },
+  { "id": 91,  "title": "Digital Portrait",         "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/9 Digital policition work.webp" },
+  { "id": 92,  "title": "B10",                      "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/b10.webp" },
+  { "id": 93,  "title": "Digital Vector Art",       "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/Digital Vector Art.webp" },
+  { "id": 94,  "title": "Fakt Mahilao Mate",        "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/fakt mahilao mate.webp" },
+  { "id": 95,  "title": "Forged In Fire",           "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/Forged in Fire.webp" },
+  { "id": 96,  "title": "SRK Jawan Poster",         "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/SRK Jawan Poster.webp" },
+  { "id": 97,  "title": "The Family Man",           "category": "celebrity",     "medium": "Digital Portrait",        "description": "Celebrity portrait.",                   "image": "/Assets/celeb/The Family Man.webp" },
+  { "id": 98,  "title": "1 Laughter Chef",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/1 Laughter Chef.webp" },
+  { "id": 99,  "title": "2 Laughter Chef",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/2 Laughter Chef.webp" },
+  { "id": 100, "title": "6 Order Work",             "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/6 Order Work..webp" },
+  { "id": 101, "title": "7 Order Work",             "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/7 Order Work...webp" },
+  { "id": 102, "title": "Brijendra Kala",           "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/8 Brijendra Kala bollywood actor.webp" },
+  { "id": 103, "title": "Gajraj Rao",               "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/9 Gajraj Rao bollywood actor.webp" },
+  { "id": 104, "title": "Caricature Work",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/10 Caricature work.webp" },
+  { "id": 105, "title": "Caricature Work",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/11 Caricature work.webp" },
+  { "id": 106, "title": "Caricature Work",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/12 Caricature work.webp" },
+  { "id": 107, "title": "Pawan Deep Caricature",    "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/13 Pawan Deep Caricature Work.webp" },
+  { "id": 108, "title": "Caricature Order Work",    "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/Caricature Odrer Work.webp" },
+  { "id": 109, "title": "Caricature Work",          "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/Caricature Work.webp" },
+  { "id": 110, "title": "Emran",                    "category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/emran.webp" },
+  { "id": 111, "title": "Sanjeev Kapoor Caricature","category": "caricature",    "medium": "Digital Caricature",      "description": "Caricature art.",                       "image": "/Assets/caricature/New caricature art for @sanjeevkapoor & @alyonakapoor 😃I hope you like it ❤️Dm me for order wor.webp" },
+  { "id": 112, "title": "1 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/1 oil painting.webp" },
+  { "id": 113, "title": "3 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/3  oil painting.webp" },
+  { "id": 114, "title": "4 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/4  oil painting.webp" },
+  { "id": 115, "title": "5 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/5  oil painting.webp" },
+  { "id": 116, "title": "6 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/6 oil painting.webp" },
+  { "id": 117, "title": "7 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/7 oil painting.webp" },
+  { "id": 118, "title": "8 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/8 oil painting.webp" },
+  { "id": 119, "title": "9 Oil Painting",           "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/9 oil painting.webp" },
+  { "id": 120, "title": "10 Oil Painting",          "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/10 oil painting.webp" },
+  { "id": 121, "title": "11 Oil Painting",          "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/11 oil painting.webp" },
+  { "id": 122, "title": "Oil Painting",             "category": "oilpainting",   "medium": "Digital Oil Painting",    "description": "Oil painting.",                         "image": "/Assets/oil/Oil Painting.webp" },
+  { "id": 123, "title": "Logo Design",              "category": "Logo",          "medium": "Logo Design",             "description": "Logo design project.",                  "image": "/Assets/Logos/ChatGPT Image Mar 8, 2026, 04_21_31 PM.webp" },
+  { "id": 124, "title": "Crypto Habibi Logo",       "category": "Logo",          "medium": "Logo Design",             "description": "Logo design project.",                  "image": "/Assets/Logos/Crypto Habibi Logo.webp" },
+  { "id": 125, "title": "ENagar Logo",              "category": "Logo",          "medium": "Logo Design",             "description": "Logo design project.",                  "image": "/Assets/Logos/freepik__professional-vector-logo-for-enagar-representing-s__50600.webp" },
+  { "id": 126, "title": "L14",                      "category": "Logo",          "medium": "Logo Design",             "description": "Logo design project.",                  "image": "/Assets/Logos/l14.webp" },
+  { "id": 127, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/4.webp" },
+  { "id": 128, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/5.webp" },
+  { "id": 129, "title": "Antim Poster",             "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/Antim postar.webp" },
+  { "id": 130, "title": "B4",                       "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/b4.webp" },
+  { "id": 131, "title": "B12",                      "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/b12.webp" },
+  { "id": 132, "title": "B13",                      "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/b13.webp" },
+  { "id": 133, "title": "B15",                      "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/b15.webp" },
+  { "id": 134, "title": "TKF Final Work",           "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/FINAL WORK OF TKF.webp" },
+  { "id": 135, "title": "Goro",                     "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/goro.webp" },
+  { "id": 136, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/PicsArt_07-10-09.43.36.webp" },
+  { "id": 137, "title": "S2",                       "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/s2.webp" },
+  { "id": 138, "title": "S5",                       "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/s5.webp" },
+  { "id": 139, "title": "S6",                       "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/s6.webp" },
+  { "id": 140, "title": "S10",                      "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/s10.webp" },
+  { "id": 141, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/stencil 2 (1).webp" },
+  { "id": 142, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/stencil 2 (2).webp" },
+  { "id": 143, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20210721_161044.webp" },
+  { "id": 144, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20210922_154932.webp" },
+  { "id": 145, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20211219_102700.webp" },
+  { "id": 146, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20220108_164305.webp" },
+  { "id": 147, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20220108_164434.webp" },
+  { "id": 148, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20220109_191628.webp" },
+  { "id": 149, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20220421_121800.webp" },
+  { "id": 150, "title": "Stencil Art",              "category": "stencil",       "medium": "Digital Stencil",         "description": "Stencil art.",                          "image": "/Assets/stencil/yeswecan_20220425_084324.webp" },
+  { "id": 151, "title": "Cinemood Website",         "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Cinemood Website.webp" },
+  { "id": 152, "title": "MediScope",                "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/MediScope.webp" },
+  { "id": 153, "title": "Mobile App Design 1",      "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Mobile App Deign  1.webp" },
+  { "id": 154, "title": "Mobile App Design 3",      "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Mobile App Deign  3.webp" },
+  { "id": 155, "title": "Mobile App Design 2",      "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Mobile App Deign 2.webp" },
+  { "id": 156, "title": "Renteeasy Hero Section",   "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Renteeasy Hero section.webp" },
+  { "id": 157, "title": "ReWear",                   "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/ReWear.webp" },
+  { "id": 158, "title": "UI/UX Design",             "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Screenshot 2026-05-30 164438.webp" },
+  { "id": 159, "title": "UI/UX Design",             "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Screenshot 2026-05-30 164515.webp" },
+  { "id": 160, "title": "UI/UX Design",             "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/Screenshot 2026-05-30 164543.webp" },
+  { "id": 161, "title": "Ui1",                      "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/ui1.webp" },
+  { "id": 162, "title": "Ui2",                      "category": "UIUX",          "medium": "UI/UX Design",            "description": "UI/UX design project.",                 "image": "/Assets/uiux/ui2.webp" },
+  { "id": 163, "title": "Certificate Coordinator",  "category": "certificate",   "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/Certificate Coordinator.webp" },
+  { "id": 164, "title": "Certificate Core Member",  "category": "certificate",   "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/Certificate Core Member.webp" },
+  { "id": 165, "title": "Certificate Volunteer",    "category": "certificate",   "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/Certificate Volunteer.webp" },
+  { "id": 166, "title": "Hackovate Certificate 1",  "category": "certificate",   "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/Hackovate Certificate 1.webp" },
+  { "id": 167, "title": "Hackovate Certificate 2",  "category": "certificate",   "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/Hackovate Certificate 2.webp" },
+  { "id": 168, "title": "LFA Issue 22 Certificate 1","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte  1.webp" },
+  { "id": 169, "title": "LFA Issue 22 Certificate 2","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 2.webp" },
+  { "id": 170, "title": "LFA Issue 22 Certificate 3","category": "certificate",  "medium": "Certificate Design",      "description": "Certificate design project.",           "image": "/Assets/Certificate/LFA Issue 22 Certifiacte 3.webp" },
 ];
 
-  // ── Filter artworks using the broad category map ─────────────────────────
-  const filteredArtworks =
-    activeCategory === "all"
-      ? artworks
-      : activeCategory === "print"
-        ? artworks.filter((a) => categoryMap[a.category] === "print" && a.category !== "brochure")
-        : artworks.filter((a) => categoryMap[a.category] === activeCategory);
+  /* ─────── derived data ───────────────────────────────────────────── */
+  const filteredArtworks: Artwork[] =
+    activeCategory === "all"      ? artworks
+    : activeCategory === "print"  ? artworks.filter(a => a.category === "stencil")
+    : activeCategory === "brochure" ? []  // brochures use separate list
+    : artworks.filter(a => a.category === activeCategory);
 
+  const showBrochures =
+    activeCategory === "print" || activeCategory === "brochure";
+
+  const visibleArtworks = filteredArtworks.slice(0, visibleCount);
+  const hasMore = filteredArtworks.length > visibleCount;
+
+  /* ═══════════════════════════════════════════════════════════════════
+     RENDER
+  ═══════════════════════════════════════════════════════════════════ */
   return (
-    <section id="gallery" className="py-20 bg-[#060714]">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Centered Heading */}
-        <div className="flex flex-col items-center text-center mb-14">
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-2">
+    <section
+      id="gallery"
+      className="relative py-24 overflow-hidden"
+      style={{ background: "linear-gradient(135deg,#faf8ff 0%,#f5f0ff 40%,#fdf4ff 70%,#f8f9ff 100%)" }}
+    >
+
+      {/* ── Blurred color bubbles ── */}
+      <div aria-hidden="true" className="pointer-events-none select-none absolute inset-0 overflow-hidden">
+        {/* Purple top-left */}
+        <div className="absolute -top-32 -left-32 w-[520px] h-[520px] rounded-full opacity-30"
+          style={{ background: "radial-gradient(circle,#a855f7,transparent 70%)", filter: "blur(80px)" }} />
+        {/* Pink top-right */}
+        <div className="absolute -top-16 right-0 w-[400px] h-[400px] rounded-full opacity-25"
+          style={{ background: "radial-gradient(circle,#f472b6,transparent 70%)", filter: "blur(90px)" }} />
+        {/* Sky-blue mid-left */}
+        <div className="absolute top-1/2 -left-24 w-[350px] h-[350px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#38bdf8,transparent 70%)", filter: "blur(80px)" }} />
+        {/* Pale yellow center-right */}
+        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#fbbf24,transparent 70%)", filter: "blur(100px)" }} />
+        {/* Purple bottom-right */}
+        <div className="absolute -bottom-24 right-0 w-[450px] h-[450px] rounded-full opacity-25"
+          style={{ background: "radial-gradient(circle,#818cf8,transparent 70%)", filter: "blur(90px)" }} />
+        {/* Pink bottom-left */}
+        <div className="absolute -bottom-12 left-1/3 w-[280px] h-[280px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle,#fb7185,transparent 70%)", filter: "blur(70px)" }} />
+      </div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* ── Heading ── */}
+        <div className="text-center mb-14">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-gray-900 mb-3">
             Creative{" "}
-            <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#a855f7] to-[#ec4899]">
+            <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
               Gallery
-              <svg width="130%" height="26" viewBox="0 0 100 26" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="absolute -bottom-[14px] -left-[5%] overflow-visible pointer-events-none">
-                <path d="M 0 24 Q 45 16 98 16" stroke="url(#galleryGradient)" strokeWidth="2.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-                <circle cx="98" cy="16" r="3" fill="#fff" filter="drop-shadow(0 0 5px #f472b6)" />
-                <defs>
-                  <linearGradient id="galleryGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#a855f7" />
-                    <stop offset="100%" stopColor="#ec4899" />
-                  </linearGradient>
-                </defs>
-              </svg>
             </span>
           </h2>
-          <p className="text-neutral-400 text-base sm:text-lg">
-            A collection of handmade and digital artworks
+          <p className="text-gray-500 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+            A collection of ideas, designs, and artistic expressions.
           </p>
         </div>
 
-        {/* Category filters — 6 broad pills */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {categories.map((cat) => (
+        {/* ── Category nav ── */}
+        <div className="flex flex-wrap justify-center items-center gap-2 mb-10">
+
+          {/* All Work */}
+          <FilterPill
+            label="All Work"
+            active={activeCategory === "all"}
+            onClick={() => selectCategory("all")}
+          />
+
+          {/* Social Media */}
+          <FilterPill
+            label="Social Media"
+            active={activeCategory === "socialmedia"}
+            onClick={() => selectCategory("socialmedia")}
+          />
+
+          {/* Print & Editorial */}
+          <FilterPill
+            label="Print & Editorial"
+            active={activeCategory === "print"}
+            onClick={() => selectCategory("print")}
+          />
+
+          {/* More Categories dropdown */}
+          <div ref={dropdownRef} className="relative">
             <button
-              key={cat.id}
-              onClick={() => { setActiveCategory(cat.id); setVisibleCount(24); }}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${
-                activeCategory === cat.id
-                  ? "bg-gradient-to-r from-[#a033ff] to-[#ff3388] border-transparent text-white shadow-[0_0_18px_rgba(160,51,255,0.45)]"
-                  : "bg-[#0c0d1a] border-white/8 text-neutral-400 hover:text-white hover:border-white/15 hover:bg-white/5"
-              }`}
+              onClick={() => setDropdownOpen(o => !o)}
+              aria-haspopup="listbox"
+              aria-expanded={dropdownOpen}
+              className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200
+                ${isMoreActive
+                  ? "bg-gradient-to-r from-purple-600 to-pink-500 text-white border-transparent shadow-lg shadow-purple-200"
+                  : "bg-white/70 backdrop-blur border-white/80 text-gray-700 hover:bg-white hover:shadow-md shadow-sm"
+                }`}
             >
-              <span className={activeCategory === cat.id ? "text-white" : "text-[#a033ff]"}>
-                {cat.icon}
-              </span>
-              {cat.label}
+              {isMoreActive ? activeLabel : "More Categories"}
+              <ChevronDown
+                size={15}
+                className={`transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+              />
             </button>
-          ))}
-        </div>
 
-
-
-        {/* ── Gallery Rendering ──────────────────────────────────────────── */}
-
-        {/* Print & Editorial: show brochures first, then stencil images */}
-        {activeCategory === 'print' ? (
-          <div className="flex flex-col gap-10">
-            {/* Brochures sub-section */}
-            <div>
-              <h3 className="text-neutral-400 text-xs uppercase tracking-widest font-semibold mb-5">Brochures</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {brochures.map((brochure) => (
-                  <div
-                    key={brochure.id}
-                    onClick={() => setActivePdf(brochure)}
-                    className="group relative rounded-2xl overflow-hidden border border-white/[0.06] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_40px_rgba(160,51,255,0.12)] hover:border-white/10"
-                  >
-                    <div className="relative h-56 w-full overflow-hidden bg-neutral-900 border-b border-white/[0.06]">
-                      <img src={brochure.cover} alt={brochure.title} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0c0d1a] via-[#0c0d1a]/20 to-transparent" />
-                      <div className={`absolute top-3 right-3 bg-gradient-to-r ${brochure.color} text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-[0_4px_12px_rgba(0,0,0,0.5)]`}>PDF</div>
-                    </div>
-                    <div className="p-5">
-                      <h4 className="text-white font-bold text-base leading-tight">{brochure.title}</h4>
-                      <p className="text-neutral-400 text-sm mt-0.5">{brochure.subtitle}</p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="text-[11px] text-neutral-600 uppercase tracking-widest font-semibold">Brochure</span>
-                        <div className="flex items-center gap-1.5 text-[#a033ff] text-xs font-semibold group-hover:text-[#ff3388] transition-colors duration-300">
-                          <ExternalLink size={12} /> View PDF
-                        </div>
-                      </div>
-                    </div>
-                    <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${brochure.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Stencil prints sub-section */}
-            {filteredArtworks.length > 0 && (
-              <div>
-                <h3 className="text-neutral-400 text-xs uppercase tracking-widest font-semibold mb-5">Stencil Art</h3>
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
-                  {filteredArtworks.slice(0, visibleCount).map((artwork) => (
-                    <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
+            {/* Glassmorphism dropdown */}
+            {dropdownOpen && (
+              <div
+                role="listbox"
+                className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 z-50 rounded-2xl overflow-hidden
+                           border border-white/60 shadow-2xl shadow-purple-100/50"
+                style={{
+                  background: "rgba(255,255,255,0.82)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
+                }}
+              >
+                <div className="p-1.5">
+                  {DROPDOWN_CATEGORIES.map(cat => (
+                    <button
+                      key={cat.id}
+                      role="option"
+                      aria-selected={activeCategory === cat.id}
+                      onClick={() => selectCategory(cat.id)}
+                      className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
+                        ${activeCategory === cat.id
+                          ? "bg-gradient-to-r from-purple-600 to-pink-500 text-white shadow-sm"
+                          : "text-gray-700 hover:bg-purple-50 hover:text-purple-700"
+                        }`}
+                    >
+                      {cat.label}
+                    </button>
                   ))}
                 </div>
-                {filteredArtworks.length > visibleCount && (
-                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={filteredArtworks.length - visibleCount} />
-                )}
               </div>
             )}
           </div>
-        ) : activeCategory === 'digital' ? (
-          // Digital & UI/UX — unified masonry
-          (() => {
-            const uiuxItems = artworks.filter(a => a.category === "UIUX");
-            const orderItems = artworks.filter(a => a.category === "digital");
-            const allDigital = [...uiuxItems, ...orderItems];
-            const visible = allDigital.slice(0, visibleCount);
-            return (
-              <div>
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
-                  {visible.map(artwork => (
-                    <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
-                  ))}
-                </div>
-                {allDigital.length > visibleCount && (
-                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={allDigital.length - visibleCount} />
-                )}
-              </div>
-            );
-          })()
-        ) : (
-          /* Standard masonry for all other filters */
-          (() => {
-            const visible = filteredArtworks.slice(0, visibleCount);
-            return (
-              <div>
-                <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5 w-full">
-                  {visible
-                    .filter(a => a.title !== "L10")
-                    .map((artwork) => (
-                      <ArtCard key={artwork.id} artwork={artwork} onClick={() => setLightboxImage(artwork)} />
-                    ))}
-                </div>
-                {filteredArtworks.length > visibleCount && (
-                  <LoadMoreBtn onClick={() => setVisibleCount(v => v + 16)} remaining={filteredArtworks.length - visibleCount} />
-                )}
-              </div>
-            );
-          })()
-        )}
+        </div>
 
-        {/* ── Lightbox Modal ─────────────────────────────────────────────── */}
-        {lightboxImage && (
-          <div
-            className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
-            onClick={() => setLightboxImage(null)}
-          >
-            <button
-              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
-              onClick={() => setLightboxImage(null)}
-            >
-              <X size={20} />
-            </button>
+        {/* ── Gallery content ── */}
 
-            <div
-              className="max-w-4xl w-full bg-[#0e0f1c] rounded-2xl overflow-hidden border border-white/10 shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="max-h-[72vh] flex items-center justify-center bg-black/30">
-                <img
-                  src={lightboxImage.image}
-                  alt={lightboxImage.title}
-                  className="w-full max-h-[72vh] object-contain"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="p-6 border-t border-white/[0.06]">
-                <h3 className="text-xl font-bold text-white mb-1">{lightboxImage.title}</h3>
-                <p className="text-purple-400 text-sm font-semibold mb-1">{lightboxImage.medium}</p>
-                <p className="text-neutral-400 text-sm">{lightboxImage.description}</p>
-              </div>
+        {/* BROCHURES (shown for "print" and "brochure" filters) */}
+        {showBrochures && (
+          <div className="mb-12">
+            {activeCategory === "print" && (
+              <SectionLabel>Brochures & Publications</SectionLabel>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {brochures.map(b => (
+                <BrochureCard key={b.id} brochure={b} onOpen={setActivePdf} />
+              ))}
             </div>
           </div>
         )}
 
-        {/* ── PDF Viewer Modal ───────────────────────────────────────────── */}
-        {activePdf && (
-          <div
-            className="fixed inset-0 z-[60] flex flex-col bg-black/95 backdrop-blur-md"
-            onClick={(e) => { if (e.target === e.currentTarget) setActivePdf(null); }}
+        {/* STENCIL sub-header when print tab is active */}
+        {activeCategory === "print" && filteredArtworks.length > 0 && (
+          <SectionLabel>Stencil Art</SectionLabel>
+        )}
+
+        {/* ARTWORK MASONRY */}
+        {visibleArtworks.length > 0 && (
+          <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-5">
+            {visibleArtworks
+              .filter(a => a.title !== "L10")
+              .map(artwork => (
+                <ArtCard
+                  key={artwork.id}
+                  artwork={artwork}
+                  onClick={() => setLightboxImage(artwork)}
+                />
+              ))}
+          </div>
+        )}
+
+        {/* Empty state (only for categories other than brochure) */}
+        {visibleArtworks.length === 0 && !showBrochures && (
+          <div className="text-center py-24 text-gray-400">
+            <p className="text-lg font-medium">No projects in this category yet.</p>
+          </div>
+        )}
+
+        {/* Load More */}
+        {hasMore && (
+          <div className="flex justify-center mt-12">
+            <button
+              onClick={() => setVisibleCount(v => v + 18)}
+              className="flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm text-white
+                         bg-gradient-to-r from-purple-600 to-pink-500
+                         hover:shadow-lg hover:shadow-purple-200 hover:scale-105
+                         active:scale-95 transition-all duration-200"
+            >
+              <ChevronDown size={17} />
+              Load More
+              <span className="font-normal opacity-80">
+                ({filteredArtworks.length - visibleCount} remaining)
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* ── Lightbox ── */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: "rgba(10,5,30,0.92)", backdropFilter: "blur(8px)" }}
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            className="absolute top-5 right-5 w-10 h-10 rounded-full bg-white/10 border border-white/20
+                       flex items-center justify-center text-white hover:bg-white/20 transition-all"
+            onClick={() => setLightboxImage(null)}
+            aria-label="Close"
           >
-            <div className="flex items-center justify-between px-5 py-3 bg-neutral-900/90 border-b border-white/[0.06] backdrop-blur-md flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${activePdf.color} flex items-center justify-center shadow-lg`}>
-                  <FileText size={18} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="text-white font-bold text-sm leading-tight">{activePdf.title}</h3>
-                  <p className="text-neutral-400 text-xs">{activePdf.subtitle}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <a
-                  href={activePdf.file}
-                  download
-                  onClick={(e) => e.stopPropagation()}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#a033ff] to-[#ff3388] text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-[0_0_20px_rgba(160,51,255,0.3)]"
-                >
-                  <Download size={13} /> Download
-                </a>
-                <button
-                  onClick={() => setActivePdf(null)}
-                  className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neutral-300 hover:text-white hover:bg-white/10 transition-all"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 relative overflow-hidden">
-              <iframe
-                src={`${activePdf.file}#toolbar=1&navpanes=1&scrollbar=1&view=FitH`}
-                className="w-full h-full border-0"
-                title={activePdf.title}
+            <X size={20} />
+          </button>
+
+          <div
+            className="max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl"
+            style={{ background: "rgba(255,255,255,0.97)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="bg-gray-50 flex items-center justify-center" style={{ maxHeight: "70vh" }}>
+              <img
+                src={lightboxImage.image}
+                alt={lightboxImage.title}
+                className="w-full object-contain"
+                style={{ maxHeight: "70vh" }}
+                loading="lazy"
+                decoding="async"
               />
             </div>
+            <div className="p-6 border-t border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{lightboxImage.title}</h3>
+              <p className="text-purple-600 text-sm font-semibold mb-1">
+                {CATEGORY_MAP[lightboxImage.category] ?? lightboxImage.medium}
+              </p>
+              <p className="text-gray-500 text-sm">{lightboxImage.description}</p>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-      </div>
+      {/* ── PDF Viewer ── */}
+      {activePdf && (
+        <div
+          className="fixed inset-0 z-[60] flex flex-col"
+          style={{ background: "rgba(10,5,30,0.96)", backdropFilter: "blur(10px)" }}
+          onClick={e => { if (e.target === e.currentTarget) setActivePdf(null); }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-3 bg-white/[0.06] border-b border-white/10 flex-shrink-0 backdrop-blur">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center shadow"
+                style={{ background: `linear-gradient(135deg,${activePdf.accentFrom},${activePdf.accentTo})` }}
+              >
+                <FileText size={18} className="text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-bold text-sm leading-tight">{activePdf.title}</h3>
+                <p className="text-white/50 text-xs">{activePdf.subtitle}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={activePdf.file}
+                download
+                onClick={e => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-white text-xs font-bold
+                           hover:opacity-90 transition-opacity shadow"
+                style={{ background: `linear-gradient(135deg,${activePdf.accentFrom},${activePdf.accentTo})` }}
+              >
+                <Download size={13} /> Download
+              </a>
+              <button
+                onClick={() => setActivePdf(null)}
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/15
+                           flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-all"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+          {/* iframe */}
+          <div className="flex-1 overflow-hidden">
+            <iframe
+              src={`${activePdf.file}#toolbar=1&navpanes=1&scrollbar=1&view=FitH`}
+              className="w-full h-full border-0"
+              title={activePdf.title}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
-// ── Reusable art card ────────────────────────────────────────────────────────
-const transparentCelebs = [
-  "/Assets/celeb/4 ravi kishan.webp",
-  "/Assets/celeb/6 anand mahindra digital artwork.webp",
-  "/Assets/celeb/8 vivek ranjan digital art.webp"
-];
+/* ═══════════════════ SUB-COMPONENTS ═══════════════════════════════ */
 
-function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }) {
+/** Pill filter button */
+function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
-    <div
-      className="break-inside-avoid mb-5 group relative rounded-[20px] overflow-hidden border border-white/[0.03] bg-[#0c0d1a] cursor-pointer transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(0,0,0,0.55),0_0_28px_rgba(160,51,255,0.14)] hover:border-white/8"
+    <button
       onClick={onClick}
+      className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200
+        ${active
+          ? "bg-gradient-to-r from-purple-600 to-pink-500 text-white border-transparent shadow-lg shadow-purple-200"
+          : "bg-white/70 backdrop-blur border-white/80 text-gray-700 hover:bg-white hover:shadow-md shadow-sm"
+        }`}
     >
-      <div className="w-full relative overflow-hidden">
-        <img
-          src={artwork.image}
-          alt={artwork.title}
-          className={`w-full h-auto object-contain transition-transform duration-700 group-hover:scale-[1.03] filter brightness-[1.04] ${
-            transparentCelebs.includes(artwork.image) ? "bg-[#e2e8f0]" : ""
-          }`}
-          loading="lazy"
-          decoding="async"
-        />
-        {/* Hover overlay with title */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-          <p className="text-white text-sm font-bold leading-tight">{artwork.title}</p>
-          <p className="text-purple-400 text-xs font-medium mt-0.5">{artwork.medium}</p>
-        </div>
-        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-300 pointer-events-none" />
-      </div>
-      <button
-        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:bg-[#ff3388]/40 hover:border-[#ff3388] z-10"
-        onClick={(e) => e.stopPropagation()}
-        aria-label="Like"
-      >
-        <Heart size={14} className="text-white" />
-      </button>
+      {label}
+    </button>
+  );
+}
+
+/** Small sub-section label */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <div className="h-px flex-1 bg-gradient-to-r from-purple-200 to-transparent" />
+      <span className="text-xs font-bold uppercase tracking-widest text-purple-400">{children}</span>
+      <div className="h-px flex-1 bg-gradient-to-l from-purple-200 to-transparent" />
     </div>
   );
 }
 
-// ── Load More button ─────────────────────────────────────────────────────────
-function LoadMoreBtn({ onClick, remaining }: { onClick: () => void; remaining: number }) {
+/** Light-theme brochure card */
+function BrochureCard({ brochure, onOpen }: { brochure: Brochure; onOpen: (b: Brochure) => void }) {
   return (
-    <div className="flex justify-center mt-10">
-      <button
-        onClick={onClick}
-        className="flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#a033ff] to-[#ff3388] rounded-full font-bold text-white text-sm hover:opacity-90 hover:shadow-[0_0_24px_rgba(160,51,255,0.45)] transition-all duration-300 active:scale-95"
-      >
-        <ChevronDown size={18} />
-        Load More <span className="opacity-70 font-normal">({remaining} remaining)</span>
-      </button>
+    <div
+      onClick={() => onOpen(brochure)}
+      className="group cursor-pointer rounded-2xl overflow-hidden bg-white border border-gray-100
+                 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+    >
+      {/* Cover image — full, unobscured */}
+      <div className="relative overflow-hidden bg-gray-50" style={{ aspectRatio: "4/3" }}>
+        <img
+          src={brochure.cover}
+          alt={brochure.title}
+          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+        />
+        {/* PDF badge — top-right corner, small */}
+        <div
+          className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-white text-[10px] font-bold uppercase tracking-wider shadow"
+          style={{ background: `linear-gradient(135deg,${brochure.accentFrom},${brochure.accentTo})` }}
+        >
+          PDF
+        </div>
+        {/* Subtle zoom hint on hover */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/8 transition-colors duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-2.5 shadow">
+            <ExternalLink size={16} className="text-gray-700" />
+          </div>
+        </div>
+      </div>
+
+      {/* Info panel — clean white surface */}
+      <div className="p-4">
+        <h4 className="text-gray-900 font-bold text-base leading-tight truncate">{brochure.title}</h4>
+        <p className="text-gray-400 text-sm mt-0.5 truncate">{brochure.subtitle}</p>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">Brochure</span>
+          <span
+            className="flex items-center gap-1 text-xs font-semibold transition-colors duration-200"
+            style={{ color: brochure.accentFrom }}
+          >
+            <FileText size={12} /> View PDF
+          </span>
+        </div>
+      </div>
+
+      {/* Bottom accent line */}
+      <div
+        className="h-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: `linear-gradient(90deg,${brochure.accentFrom},${brochure.accentTo})` }}
+      />
+    </div>
+  );
+}
+
+/** Light-theme artwork card */
+const TRANSPARENT_CELEBS_ARR = [
+  "/Assets/celeb/4 ravi kishan.webp",
+  "/Assets/celeb/6 anand mahindra digital artwork.webp",
+  "/Assets/celeb/8 vivek ranjan digital art.webp",
+];
+
+function ArtCard({ artwork, onClick }: { artwork: Artwork; onClick: () => void }) {
+  const needsLightBg = TRANSPARENT_CELEBS_ARR.includes(artwork.image);
+  return (
+    <div
+      className="break-inside-avoid mb-5 group relative cursor-pointer rounded-2xl overflow-hidden
+                 bg-white border border-gray-100 shadow-sm
+                 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      onClick={onClick}
+    >
+      <div className={`relative overflow-hidden ${needsLightBg ? "bg-slate-100" : "bg-gray-50"}`}>
+        <img
+          src={artwork.image}
+          alt={artwork.title}
+          className="w-full h-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+        />
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                        flex flex-col justify-end p-4">
+          <p className="text-white text-sm font-bold leading-tight drop-shadow">{artwork.title}</p>
+          <p className="text-purple-200 text-xs font-medium mt-0.5 drop-shadow">
+            {CATEGORY_MAP[artwork.category] ?? artwork.medium}
+          </p>
+        </div>
+        {/* Zoom icon */}
+        <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur
+                        flex items-center justify-center opacity-0 group-hover:opacity-100
+                        transition-opacity duration-300 shadow">
+          <ZoomIn size={14} className="text-gray-700" />
+        </div>
+      </div>
     </div>
   );
 }
